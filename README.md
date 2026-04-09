@@ -37,6 +37,6 @@ Tiara Edita Kurniasari – 124250065
 
 Asisten Lab:
 
-Luthfan Kafi Maulana - 124230165)
+Luthfan Kafi Maulana - 124230165
 
-Krisna Mus'ad Zein - 124240154)
+Krisna Mus'ad Zein - 124240154
