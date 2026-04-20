@@ -1,6 +1,6 @@
 <?php
-require_once "../config/config.php";
-
-unset($_SESSION['user']);
-echo "<script>window.location='".base_url('auth/login.php')."'</script>";
+session_start();
+session_destroy();
+header("Location: login.php");
+exit;
 ?>
