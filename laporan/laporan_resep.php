@@ -9,10 +9,12 @@ ORDER BY r.tanggal_resep DESC");
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Laporan Resep</title>
 </head>
+
 <body>
     <h2>Laporan Resep</h2>
     <table border="1" cellpadding="8">
@@ -23,15 +25,17 @@ ORDER BY r.tanggal_resep DESC");
             <th>Dokter</th>
             <th>Catatan</th>
         </tr>
-        <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
-        <tr>
-            <td><?= $no++; ?></td>
-            <td><?= htmlspecialchars($row['tanggal_resep']); ?></td>
-            <td><?= htmlspecialchars($row['nama_pasien']); ?></td>
-            <td><?= htmlspecialchars($row['nama_dokter']); ?></td>
-            <td><?= htmlspecialchars($row['catatan']); ?></td>
-        </tr>
+        <?php $no = 1;
+        while ($row = mysqli_fetch_assoc($data)) { ?>
+            <tr>
+                <td><?= $no++; ?></td>
+                <td><?= htmlspecialchars($row['tanggal_resep']); ?></td>
+                <td><?= htmlspecialchars($row['nama_pasien']); ?></td>
+                <td><?= htmlspecialchars($row['nama_dokter']); ?></td>
+                <td><?= htmlspecialchars($row['catatan']); ?></td>
+            </tr>
         <?php } ?>
     </table>
 </body>
+
 </html>
