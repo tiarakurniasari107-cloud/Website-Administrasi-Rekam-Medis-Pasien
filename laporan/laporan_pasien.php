@@ -9,7 +9,7 @@ if (!isset($_SESSION['id'])) {
 
 $data = mysqli_query($koneksi, "
     SELECT *
-    FROM obat
+    FROM pasien
     ORDER BY id DESC
 ");
 ?>
@@ -18,21 +18,18 @@ $data = mysqli_query($koneksi, "
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Obat</title>
+    <title>Laporan Pasien</title>
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 
 <div class="container mt-4">
 
-    <h2>Laporan Obat</h2>
+    <h2>Laporan Pasien</h2>
 
-    <a href="index.php" class="btn btn-secondary">
-        Kembali
-    </a>
+    <a href="index.php" class="btn btn-secondary">Kembali</a>
 
-    <a href="print.php?jenis=obat"
+    <a href="print.php?jenis=pasien"
        target="_blank"
        class="btn btn-success">
         Print
@@ -44,31 +41,25 @@ $data = mysqli_query($koneksi, "
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Obat</th>
-                <th>Nama Obat</th>
-                <th>Kategori</th>
-                <th>Satuan</th>
-                <th>Stok</th>
-                <th>Harga</th>
+                <th>No RM</th>
+                <th>Nama Pasien</th>
+                <th>Jenis Kelamin</th>
+                <th>No HP</th>
+                <th>Alamat</th>
             </tr>
         </thead>
 
         <tbody>
-
         <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
-
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_obat']; ?></td>
-                <td><?= $row['nama_obat']; ?></td>
-                <td><?= $row['kategori_obat']; ?></td>
-                <td><?= $row['satuan']; ?></td>
-                <td><?= $row['stok']; ?></td>
-                <td><?= $row['harga']; ?></td>
+                <td><?= $row['no_rm']; ?></td>
+                <td><?= $row['nama_pasien']; ?></td>
+                <td><?= $row['jenis_kelamin']; ?></td>
+                <td><?= $row['no_hp']; ?></td>
+                <td><?= $row['alamat']; ?></td>
             </tr>
-
         <?php } ?>
-
         </tbody>
     </table>
 

@@ -1,8 +1,9 @@
 <?php
 require_once '../config/koneksi.php';
 
-if (isset($_POST['simpan'])) {
+if (isset($_POST['update'])) {
 
+    $id               = $_POST['id'];
     $kode_resep       = $_POST['kode_resep'];
     $rekam_medis_id   = $_POST['rekam_medis_id'];
     $pasien_id        = $_POST['pasien_id'];
@@ -14,27 +15,17 @@ if (isset($_POST['simpan'])) {
     $catatan          = $_POST['catatan'];
 
     mysqli_query($koneksi, "
-        INSERT INTO resep (
-            kode_resep,
-            rekam_medis_id,
-            pasien_id,
-            dokter_id,
-            obat_id,
-            dosis,
-            aturan_pakai,
-            jumlah,
-            catatan
-        ) VALUES (
-            '$kode_resep',
-            '$rekam_medis_id',
-            '$pasien_id',
-            '$dokter_id',
-            '$obat_id',
-            '$dosis',
-            '$aturan_pakai',
-            '$jumlah',
-            '$catatan'
-        )
+        UPDATE resep SET
+            kode_resep = '$kode_resep',
+            rekam_medis_id = '$rekam_medis_id',
+            pasien_id = '$pasien_id',
+            dokter_id = '$dokter_id',
+            obat_id = '$obat_id',
+            dosis = '$dosis',
+            aturan_pakai = '$aturan_pakai',
+            jumlah = '$jumlah',
+            catatan = '$catatan'
+        WHERE id = '$id'
     ");
 
     header("Location: index.php");

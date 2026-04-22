@@ -7,6 +7,13 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
+$id = $_GET['id'];
+
+$data = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT * FROM resep
+    WHERE id = '$id'
+"));
+
 $rekam_medis = mysqli_query($koneksi, "
     SELECT * FROM rekam_medis
     ORDER BY id DESC
@@ -32,22 +39,26 @@ $obat = mysqli_query($koneksi, "
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Tambah Resep</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Resep</title>
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 
 <div class="container mt-4">
 
-    <h2>Tambah Resep</h2>
+    <h2>Edit Resep</h2>
 
-    <form action="proses.php" method="POST">
+    <form action="proses_edit.php" method="POST">
+
+        <input type="hidden" name="id" value="<?= $data['id']; ?>">
 
         <div class="mb-2">
             <label>Kode Resep</label>
             <input type="text"
                    name="kode_resep"
                    class="form-control"
+                   value="<?= $data['kode_resep']; ?>"
                    required>
         </div>
 
@@ -56,9 +67,9 @@ $obat = mysqli_query($koneksi, "
             <select name="rekam_medis_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Rekam Medis --</option>
                 <?php while($row = mysqli_fetch_assoc($rekam_medis)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['rekam_medis_id']) ? 'selected' : ''; ?>>
                         <?= $row['kode_rekam_medis']; ?>
                     </option>
                 <?php } ?>
@@ -70,9 +81,9 @@ $obat = mysqli_query($koneksi, "
             <select name="pasien_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Pasien --</option>
                 <?php while($row = mysqli_fetch_assoc($pasien)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['pasien_id']) ? 'selected' : ''; ?>>
                         <?= $row['nama_pasien']; ?>
                     </option>
                 <?php } ?>
@@ -84,9 +95,9 @@ $obat = mysqli_query($koneksi, "
             <select name="dokter_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Dokter --</option>
                 <?php while($row = mysqli_fetch_assoc($dokter)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['dokter_id']) ? 'selected' : ''; ?>>
                         <?= $row['nama_dokter']; ?>
                     </option>
                 <?php } ?>
@@ -98,9 +109,9 @@ $obat = mysqli_query($koneksi, "
             <select name="obat_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Obat --</option>
                 <?php while($row = mysqli_fetch_assoc($obat)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['obat_id']) ? 'selected' : ''; ?>>
                         <?= $row['nama_obat']; ?>
                     </option>
                 <?php } ?>
@@ -112,6 +123,7 @@ $obat = mysqli_query($koneksi, "
             <input type="text"
                    name="dosis"
                    class="form-control"
+                   value="<?= $data['dosis']; ?>"
                    required>
         </div>
 
@@ -119,7 +131,7 @@ $obat = mysqli_query($koneksi, "
             <label>Aturan Pakai</label>
             <textarea name="aturan_pakai"
                       class="form-control"
-                      required></textarea>
+                      required><?= $data['aturan_pakai']; ?></textarea>
         </div>
 
         <div class="mb-2">
@@ -127,19 +139,20 @@ $obat = mysqli_query($koneksi, "
             <input type="number"
                    name="jumlah"
                    class="form-control"
+                   value="<?= $data['jumlah']; ?>"
                    required>
         </div>
 
         <div class="mb-2">
             <label>Catatan</label>
             <textarea name="catatan"
-                      class="form-control"></textarea>
+                      class="form-control"><?= $data['catatan']; ?></textarea>
         </div>
 
         <button type="submit"
-                name="simpan"
-                class="btn btn-primary">
-            Simpan
+                name="update"
+                class="btn btn-success">
+            Update
         </button>
 
         <a href="index.php"
