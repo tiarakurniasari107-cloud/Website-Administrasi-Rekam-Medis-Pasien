@@ -7,6 +7,13 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
+$id = $_GET['id'];
+
+$data = mysqli_fetch_assoc(mysqli_query($koneksi, "
+    SELECT * FROM rekam_medis
+    WHERE id = '$id'
+"));
+
 $kunjungan = mysqli_query($koneksi, "
     SELECT * FROM kunjungan
     ORDER BY id DESC
@@ -27,22 +34,26 @@ $dokter = mysqli_query($koneksi, "
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Tambah Rekam Medis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Rekam Medis</title>
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 
 <div class="container mt-4">
 
-    <h2>Tambah Rekam Medis</h2>
+    <h2>Edit Rekam Medis</h2>
 
-    <form action="proses.php" method="POST">
+    <form action="proses_edit.php" method="POST">
+
+        <input type="hidden" name="id" value="<?= $data['id']; ?>">
 
         <div class="mb-2">
             <label>Kode Rekam Medis</label>
             <input type="text"
                    name="kode_rekam_medis"
                    class="form-control"
+                   value="<?= $data['kode_rekam_medis']; ?>"
                    required>
         </div>
 
@@ -51,9 +62,9 @@ $dokter = mysqli_query($koneksi, "
             <select name="kunjungan_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Kunjungan --</option>
                 <?php while($row = mysqli_fetch_assoc($kunjungan)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['kunjungan_id']) ? 'selected' : ''; ?>>
                         <?= $row['kode_kunjungan']; ?>
                     </option>
                 <?php } ?>
@@ -65,9 +76,9 @@ $dokter = mysqli_query($koneksi, "
             <select name="pasien_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Pasien --</option>
                 <?php while($row = mysqli_fetch_assoc($pasien)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['pasien_id']) ? 'selected' : ''; ?>>
                         <?= $row['nama_pasien']; ?>
                     </option>
                 <?php } ?>
@@ -79,9 +90,9 @@ $dokter = mysqli_query($koneksi, "
             <select name="dokter_id"
                     class="form-control"
                     required>
-                <option value="">-- Pilih Dokter --</option>
                 <?php while($row = mysqli_fetch_assoc($dokter)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>"
+                        <?= ($row['id'] == $data['dokter_id']) ? 'selected' : ''; ?>>
                         <?= $row['nama_dokter']; ?>
                     </option>
                 <?php } ?>
@@ -91,39 +102,39 @@ $dokter = mysqli_query($koneksi, "
         <div class="mb-2">
             <label>Anamnesa</label>
             <textarea name="anamnesa"
-                      class="form-control"></textarea>
+                      class="form-control"><?= $data['anamnesa']; ?></textarea>
         </div>
 
         <div class="mb-2">
             <label>Pemeriksaan Fisik</label>
             <textarea name="pemeriksaan_fisik"
-                      class="form-control"></textarea>
+                      class="form-control"><?= $data['pemeriksaan_fisik']; ?></textarea>
         </div>
 
         <div class="mb-2">
             <label>Diagnosa</label>
             <textarea name="diagnosa"
                       class="form-control"
-                      required></textarea>
+                      required><?= $data['diagnosa']; ?></textarea>
         </div>
 
         <div class="mb-2">
             <label>Tindakan Medis</label>
             <textarea name="tindakan_medis"
                       class="form-control"
-                      required></textarea>
+                      required><?= $data['tindakan_medis']; ?></textarea>
         </div>
 
         <div class="mb-2">
             <label>Catatan Dokter</label>
             <textarea name="catatan_dokter"
-                      class="form-control"></textarea>
+                      class="form-control"><?= $data['catatan_dokter']; ?></textarea>
         </div>
 
         <button type="submit"
-                name="simpan"
-                class="btn btn-primary">
-            Simpan
+                name="update"
+                class="btn btn-success">
+            Update
         </button>
 
         <a href="index.php"

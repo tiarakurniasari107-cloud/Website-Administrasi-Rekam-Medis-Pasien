@@ -2,18 +2,33 @@
 require_once '../config/koneksi.php';
 
 if (isset($_POST['update'])) {
-    $id_dokter  = $_POST['id_dokter'];
-    $nama_dokter = $_POST['nama_dokter'];
-    $spesialis   = $_POST['spesialis'];
-    $id_poli     = $_POST['id_poli'];
-    $no_sip      = $_POST['no_sip'];
 
-    mysqli_query($koneksi, "UPDATE dokter SET 
-        nama_dokter='$nama_dokter',
-        spesialis='$spesialis',
-        id_poli='$id_poli',
-        no_sip='$no_sip'
-        WHERE id_dokter='$id_dokter'");
+    $id = $_POST['id'];
+    $kode_dokter = $_POST['kode_dokter'];
+    $nama_dokter = $_POST['nama_dokter'];
+    $jenis_kelamin = $_POST['jenis_kelamin'];
+    $spesialisasi = $_POST['spesialisasi'];
+    $no_sip = $_POST['no_sip'];
+    $no_telp = $_POST['no_telp'];
+    $alamat = $_POST['alamat'];
+    $poli_id = $_POST['poli_id'];
+    $status = $_POST['status'];
+
+    mysqli_query($koneksi, "
+        UPDATE dokter SET
+            kode_dokter = '$kode_dokter',
+            nama_dokter = '$nama_dokter',
+            jenis_kelamin = '$jenis_kelamin',
+            spesialisasi = '$spesialisasi',
+            no_sip = '$no_sip',
+            no_telp = '$no_telp',
+            alamat = '$alamat',
+            poli_id = '$poli_id',
+            status = '$status'
+        WHERE id = '$id'
+    ");
 
     header("Location: index.php");
+    exit;
 }
+?>

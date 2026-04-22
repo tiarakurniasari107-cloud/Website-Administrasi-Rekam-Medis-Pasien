@@ -1,6 +1,16 @@
 <?php
+session_start();
 require_once '../config/koneksi.php';
-$data = mysqli_query($koneksi, "SELECT * FROM poli ORDER BY nama_poli ASC");
+
+if (!isset($_SESSION['id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+$data = mysqli_query($koneksi, "
+    SELECT * FROM poli
+    ORDER BY id DESC
+");
 ?>
 
 <!DOCTYPE html>
@@ -8,28 +18,64 @@ $data = mysqli_query($koneksi, "SELECT * FROM poli ORDER BY nama_poli ASC");
 <head>
     <meta charset="UTF-8">
     <title>Data Poli</title>
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
+
+<div class="container mt-4">
+
     <h2>Data Poli</h2>
-    <a href="create.php">+ Tambah Poli</a>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>No</th>
-            <th>Nama Poli</th>
-            <th>Keterangan</th>
-            <th>Aksi</th>
-        </tr>
+
+    <a href="../dashboard/index.php" class="btn btn-secondary">
+        Kembali
+    </a>
+
+    <a href="create.php" class="btn btn-primary">
+        + Tambah Poli
+    </a>
+
+    <br><br>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Poli</th>
+                <th>Keterangan</th>
+                <th>Aksi</th>
+            </tr>
+
+        <tbody>
+
         <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
-        <tr>
-            <td><?= $no++; ?></td>
-            <td><?= htmlspecialchars($row['nama_poli']); ?></td>
-            <td><?= htmlspecialchars($row['keterangan']); ?></td>
-            <td>
-                <a href="edit.php?id=<?= $row['id_poli']; ?>">Edit</a> |
-                <a href="delete.php?id=<?= $row['id_poli']; ?>" onclick="return confirm('Hapus data ini?')">Hapus</a>
-            </td>
-        </tr>
+
+            <tr>
+                <td><?= $no++; ?></td>
+                <td><?= $row['kode_poli']; ?></td>
+                <td><?= $row['nama_poli']; ?></td>
+                <td><?= $row['keterangan']; ?></td>
+                <td>
+
+                    <a href="edit.php?id=<?= $row['id']; ?>"
+                       class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                    <a href="delete.php?id=<?= $row['id']; ?>"
+                       onclick="return confirm('Yakin hapus data?')"
+                       class="btn btn-danger btn-sm">
+                        Hapus
+                    </a>
+
+                </td>
+            </tr>
+
         <?php } ?>
+
+        </tbody>
     </table>
+
+</div>
+
 </body>
 </html>
