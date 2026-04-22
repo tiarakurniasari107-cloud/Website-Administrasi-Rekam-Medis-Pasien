@@ -10,11 +10,14 @@ if (isset($_POST['login'])) {
     $data = mysqli_fetch_assoc($query);
 
     if ($data) {
+        session_regenerate_id(true);
         $_SESSION['login'] = true;
+        $_SESSION['id'] = $data['id'];
+        $_SESSION['nama'] = $data['nama_lengkap'];
         $_SESSION['user_id'] = $data['id'];
         $_SESSION['nama_lengkap'] = $data['nama_lengkap'];
         $_SESSION['role'] = $data['role'];
-        header("Location: ../dashboard/index.php");
+        header("Location:../dashboard/index.php");
         exit;
     } else {
         $error = "Username atau password salah";
