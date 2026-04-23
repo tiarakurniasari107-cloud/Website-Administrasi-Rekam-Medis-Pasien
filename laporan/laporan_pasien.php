@@ -7,11 +7,13 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT *
+$stmt = mysqli_prepare($koneksi, "
+    SELECT no_rm, nama_pasien, jenis_kelamin, no_telp, alamat
     FROM pasien
     ORDER BY id DESC
 ");
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -53,15 +55,17 @@ $data = mysqli_query($koneksi, "
         <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['no_rm']; ?></td>
-                <td><?= $row['nama_pasien']; ?></td>
-                <td><?= $row['jenis_kelamin']; ?></td>
-                <td><?= $row['no_hp']; ?></td>
-                <td><?= $row['alamat']; ?></td>
+                <td><?= htmlspecialchars($row['no_rm'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= ($row['jenis_kelamin'] === 'L') ? 'Laki-laki' : 'Perempuan'; ?></td>
+                <td><?= htmlspecialchars($row['no_telp'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['alamat'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
         <?php } ?>
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

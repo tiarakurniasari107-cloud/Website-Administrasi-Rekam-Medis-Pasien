@@ -7,16 +7,24 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT 
-        rm.*,
+$stmt = mysqli_prepare(
+    $koneksi,
+    "SELECT 
+        k.kode_kunjungan,
         p.nama_pasien,
-        d.nama_dokter
+        d.nama_dokter,
+        rm.keluhan,
+        rm.diagnosa_kerja,
+        rm.terapi,
+        rm.tanggal_pemeriksaan
     FROM rekam_medis rm
-    LEFT JOIN pasien p ON rm.pasien_id = p.id
-    LEFT JOIN dokter d ON rm.dokter_id = d.id
-    ORDER BY rm.id DESC
-");
+    INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
+    INNER JOIN pasien p ON k.pasien_id = p.id
+    INNER JOIN dokter d ON k.dokter_id = d.id
+    ORDER BY rm.id DESC"
+);
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -48,11 +56,13 @@ $data = mysqli_query($koneksi, "
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Rekam Medis</th>
+                <th>Kode Kunjungan</th>
                 <th>Pasien</th>
                 <th>Dokter</th>
-                <th>Diagnosa</th>
-                <th>Tindakan</th>
+                <th>Keluhan</th>
+                <th>Diagnosa Kerja</th>
+                <th>Terapi</th>
+                <th>Tanggal Pemeriksaan</th>
             </tr>
         </thead>
 
@@ -62,17 +72,21 @@ $data = mysqli_query($koneksi, "
 
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_rekam_medis']; ?></td>
-                <td><?= $row['nama_pasien']; ?></td>
-                <td><?= $row['nama_dokter']; ?></td>
-                <td><?= $row['diagnosa']; ?></td>
-                <td><?= $row['tindakan']; ?></td>
+                <td><?= htmlspecialchars($row['kode_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['keluhan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['diagnosa_kerja'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['terapi'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['tanggal_pemeriksaan'], ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
 
         <?php } ?>
 
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

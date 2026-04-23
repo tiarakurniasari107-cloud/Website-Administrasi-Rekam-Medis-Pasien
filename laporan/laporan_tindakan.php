@@ -7,11 +7,13 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT *
+$stmt = mysqli_prepare($koneksi, "
+    SELECT nama_tindakan, tarif, keterangan
     FROM tindakan
     ORDER BY id DESC
 ");
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -43,10 +45,8 @@ $data = mysqli_query($koneksi, "
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Tindakan</th>
                 <th>Nama Tindakan</th>
-                <th>Kategori</th>
-                <th>Biaya</th>
+                <th>Tarif</th>
                 <th>Keterangan</th>
             </tr>
         </thead>
@@ -57,17 +57,17 @@ $data = mysqli_query($koneksi, "
 
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_tindakan']; ?></td>
-                <td><?= $row['nama_tindakan']; ?></td>
-                <td><?= $row['kategori_tindakan']; ?></td>
-                <td><?= $row['biaya']; ?></td>
-                <td><?= $row['keterangan']; ?></td>
+                <td><?= htmlspecialchars($row['nama_tindakan'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= number_format((float) $row['tarif'], 0, ',', '.'); ?></td>
+                <td><?= htmlspecialchars($row['keterangan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
 
         <?php } ?>
 
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

@@ -7,12 +7,14 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT d.*, p.nama_poli
+$stmt = mysqli_prepare($koneksi, "
+    SELECT d.kode_dokter, d.nama_dokter, d.spesialisasi, p.nama_poli, d.no_sip
     FROM dokter d
     LEFT JOIN poli p ON d.poli_id = p.id
     ORDER BY d.id DESC
 ");
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -54,15 +56,17 @@ $data = mysqli_query($koneksi, "
         <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_dokter']; ?></td>
-                <td><?= $row['nama_dokter']; ?></td>
-                <td><?= $row['spesialis']; ?></td>
-                <td><?= $row['nama_poli']; ?></td>
-                <td><?= $row['no_sip']; ?></td>
+                <td><?= htmlspecialchars($row['kode_dokter'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['spesialisasi'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_poli'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['no_sip'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
         <?php } ?>
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

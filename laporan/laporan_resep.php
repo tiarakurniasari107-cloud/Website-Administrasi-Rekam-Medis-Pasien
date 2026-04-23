@@ -7,18 +7,27 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT
-        r.*,
+$stmt = mysqli_prepare(
+    $koneksi,
+    "SELECT
+        k.kode_kunjungan,
         p.nama_pasien,
         d.nama_dokter,
-        o.nama_obat
+        r.tanggal_resep,
+        r.catatan,
+        GROUP_CONCAT(CONCAT(o.nama_obat, ' (', rd.dosis, ', ', rd.jumlah, ')') SEPARATOR '; ') AS daftar_obat
     FROM resep r
-    LEFT JOIN pasien p ON r.pasien_id = p.id
-    LEFT JOIN dokter d ON r.dokter_id = d.id
-    LEFT JOIN obat o ON r.obat_id = o.id
-    ORDER BY r.id DESC
-");
+    INNER JOIN rekam_medis rm ON r.rekam_medis_id = rm.id
+    INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
+    INNER JOIN pasien p ON k.pasien_id = p.id
+    INNER JOIN dokter d ON k.dokter_id = d.id
+    LEFT JOIN resep_detail rd ON rd.resep_id = r.id
+    LEFT JOIN obat o ON rd.obat_id = o.id
+    GROUP BY r.id, k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep, r.catatan
+    ORDER BY r.id DESC"
+);
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -50,12 +59,12 @@ $data = mysqli_query($koneksi, "
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Resep</th>
+                <th>Kode Kunjungan</th>
                 <th>Pasien</th>
                 <th>Dokter</th>
-                <th>Obat</th>
-                <th>Dosis</th>
-                <th>Jumlah</th>
+                <th>Tanggal Resep</th>
+                <th>Daftar Obat</th>
+                <th>Catatan</th>
             </tr>
         </thead>
 
@@ -65,18 +74,20 @@ $data = mysqli_query($koneksi, "
 
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_resep']; ?></td>
-                <td><?= $row['nama_pasien']; ?></td>
-                <td><?= $row['nama_dokter']; ?></td>
-                <td><?= $row['nama_obat']; ?></td>
-                <td><?= $row['dosis']; ?></td>
-                <td><?= $row['jumlah']; ?></td>
+                <td><?= htmlspecialchars($row['kode_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['tanggal_resep'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['daftar_obat'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['catatan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
 
         <?php } ?>
 
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

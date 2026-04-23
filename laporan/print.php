@@ -7,94 +7,96 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
+$jenis = $_GET['jenis'] ?? '';
+$title = 'Laporan Data';
+$headers = [];
+$sql = '';
 
-$title = "Laporan Data";
+if (!in_array($jenis, ['pasien', 'dokter', 'poli', 'kunjungan', 'rekam_medis', 'obat', 'tindakan', 'resep'], true)) {
+    die('Jenis laporan tidak ditemukan.');
+}
 
 switch ($jenis) {
-
     case 'pasien':
-        $title = "Laporan Data Pasien";
-        $query = mysqli_query($koneksi, "
-            SELECT *
-            FROM pasien
-            ORDER BY id DESC
-        ");
+        $title = 'Laporan Data Pasien';
+        $headers = ['No RM', 'Nama Pasien', 'Jenis Kelamin', 'No Telp', 'Alamat'];
+        $sql = "SELECT no_rm, nama_pasien, jenis_kelamin, no_telp, alamat FROM pasien ORDER BY id DESC";
         break;
 
     case 'dokter':
-        $title = "Laporan Data Dokter";
-        $query = mysqli_query($koneksi, "
-            SELECT d.*, p.nama_poli
-            FROM dokter d
-            LEFT JOIN poli p ON d.poli_id = p.id
-            ORDER BY d.id DESC
-        ");
+        $title = 'Laporan Data Dokter';
+        $headers = ['Kode Dokter', 'Nama Dokter', 'Spesialisasi', 'Poli', 'No SIP'];
+        $sql = "SELECT d.kode_dokter, d.nama_dokter, d.spesialisasi, p.nama_poli, d.no_sip
+                FROM dokter d
+                LEFT JOIN poli p ON d.poli_id = p.id
+                ORDER BY d.id DESC";
         break;
 
     case 'poli':
-        $title = "Laporan Data Poli";
-        $query = mysqli_query($koneksi, "
-            SELECT *
-            FROM poli
-            ORDER BY id DESC
-        ");
+        $title = 'Laporan Data Poli';
+        $headers = ['Nama Poli', 'Keterangan'];
+        $sql = "SELECT nama_poli, keterangan FROM poli ORDER BY id DESC";
         break;
 
     case 'kunjungan':
-        $title = "Laporan Data Kunjungan";
-        $query = mysqli_query($koneksi, "
-            SELECT k.*, p.nama_pasien, d.nama_dokter
-            FROM kunjungan k
-            LEFT JOIN pasien p ON k.pasien_id = p.id
-            LEFT JOIN dokter d ON k.dokter_id = d.id
-            ORDER BY k.id DESC
-        ");
+        $title = 'Laporan Data Kunjungan';
+        $headers = ['Kode Kunjungan', 'Tanggal', 'Pasien', 'Dokter', 'Poli', 'Keluhan Utama', 'Status'];
+        $sql = "SELECT k.kode_kunjungan, k.tanggal_kunjungan, p.nama_pasien, d.nama_dokter, pl.nama_poli, k.keluhan_utama, k.status_kunjungan
+                FROM kunjungan k
+                INNER JOIN pasien p ON k.pasien_id = p.id
+                INNER JOIN dokter d ON k.dokter_id = d.id
+                LEFT JOIN poli pl ON k.poli_id = pl.id
+                ORDER BY k.id DESC";
         break;
 
     case 'rekam_medis':
-        $title = "Laporan Rekam Medis";
-        $query = mysqli_query($koneksi, "
-            SELECT rm.*, p.nama_pasien, d.nama_dokter
-            FROM rekam_medis rm
-            LEFT JOIN pasien p ON rm.pasien_id = p.id
-            LEFT JOIN dokter d ON rm.dokter_id = d.id
-            ORDER BY rm.id DESC
-        ");
+        $title = 'Laporan Rekam Medis';
+        $headers = ['Kode Kunjungan', 'Pasien', 'Dokter', 'Keluhan', 'Diagnosa Kerja', 'Terapi', 'Tanggal Pemeriksaan'];
+        $sql = "SELECT k.kode_kunjungan, p.nama_pasien, d.nama_dokter, rm.keluhan, rm.diagnosa_kerja, rm.terapi, rm.tanggal_pemeriksaan
+                FROM rekam_medis rm
+                INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
+                INNER JOIN pasien p ON k.pasien_id = p.id
+                INNER JOIN dokter d ON k.dokter_id = d.id
+                ORDER BY rm.id DESC";
         break;
 
     case 'obat':
-        $title = "Laporan Data Obat";
-        $query = mysqli_query($koneksi, "
-            SELECT *
-            FROM obat
-            ORDER BY id DESC
-        ");
+        $title = 'Laporan Data Obat';
+        $headers = ['Nama Obat', 'Satuan', 'Stok', 'Harga', 'Keterangan'];
+        $sql = "SELECT nama_obat, satuan, stok, harga, keterangan FROM obat ORDER BY id DESC";
         break;
 
     case 'tindakan':
-        $title = "Laporan Data Tindakan";
-        $query = mysqli_query($koneksi, "
-            SELECT *
-            FROM tindakan
-            ORDER BY id DESC
-        ");
+        $title = 'Laporan Data Tindakan';
+        $headers = ['Nama Tindakan', 'Tarif', 'Keterangan'];
+        $sql = "SELECT nama_tindakan, tarif, keterangan FROM tindakan ORDER BY id DESC";
         break;
 
     case 'resep':
-        $title = "Laporan Data Resep";
-        $query = mysqli_query($koneksi, "
-            SELECT r.*, p.nama_pasien, d.nama_dokter, o.nama_obat
-            FROM resep r
-            LEFT JOIN pasien p ON r.pasien_id = p.id
-            LEFT JOIN dokter d ON r.dokter_id = d.id
-            LEFT JOIN obat o ON r.obat_id = o.id
-            ORDER BY r.id DESC
-        ");
+        $title = 'Laporan Data Resep';
+        $headers = ['Kode Kunjungan', 'Pasien', 'Dokter', 'Tanggal Resep', 'Daftar Obat', 'Catatan'];
+        $sql = "SELECT k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep,
+                    GROUP_CONCAT(CONCAT(o.nama_obat, ' (', rd.dosis, ', ', rd.jumlah, ')') SEPARATOR '; ') AS daftar_obat,
+                    r.catatan
+                FROM resep r
+                INNER JOIN rekam_medis rm ON r.rekam_medis_id = rm.id
+                INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
+                INNER JOIN pasien p ON k.pasien_id = p.id
+                INNER JOIN dokter d ON k.dokter_id = d.id
+                LEFT JOIN resep_detail rd ON rd.resep_id = r.id
+                LEFT JOIN obat o ON rd.obat_id = o.id
+                GROUP BY r.id, k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep, r.catatan
+                ORDER BY r.id DESC";
         break;
+}
 
-    default:
-        die("Jenis laporan tidak ditemukan.");
+$stmt = mysqli_prepare($koneksi, $sql);
+mysqli_stmt_execute($stmt);
+$query = mysqli_stmt_get_result($stmt);
+
+function e($value)
+{
+    return htmlspecialchars((string) ($value ?? '-'), ENT_QUOTES, 'UTF-8');
 }
 ?>
 
@@ -140,167 +142,73 @@ switch ($jenis) {
 <table class="table table-bordered">
     <thead>
         <tr>
-
-<?php
-if ($jenis == 'pasien') {
-    echo "
-        <th>No RM</th>
-        <th>Nama Pasien</th>
-        <th>Jenis Kelamin</th>
-        <th>No HP</th>
-    ";
-}
-
-elseif ($jenis == 'dokter') {
-    echo "
-        <th>Kode Dokter</th>
-        <th>Nama Dokter</th>
-        <th>Spesialis</th>
-        <th>Poli</th>
-    ";
-}
-
-elseif ($jenis == 'poli') {
-    echo "
-        <th>Kode Poli</th>
-        <th>Nama Poli</th>
-        <th>Keterangan</th>
-    ";
-}
-
-elseif ($jenis == 'kunjungan') {
-    echo "
-        <th>Kode Kunjungan</th>
-        <th>Pasien</th>
-        <th>Dokter</th>
-        <th>Keluhan</th>
-    ";
-}
-
-elseif ($jenis == 'rekam_medis') {
-    echo "
-        <th>Kode Rekam Medis</th>
-        <th>Pasien</th>
-        <th>Dokter</th>
-        <th>Diagnosa</th>
-    ";
-}
-
-elseif ($jenis == 'obat') {
-    echo "
-        <th>Kode Obat</th>
-        <th>Nama Obat</th>
-        <th>Stok</th>
-        <th>Harga</th>
-    ";
-}
-
-elseif ($jenis == 'tindakan') {
-    echo "
-        <th>Kode Tindakan</th>
-        <th>Nama Tindakan</th>
-        <th>Biaya</th>
-    ";
-}
-
-elseif ($jenis == 'resep') {
-    echo "
-        <th>Kode Resep</th>
-        <th>Pasien</th>
-        <th>Dokter</th>
-        <th>Obat</th>
-        <th>Jumlah</th>
-    ";
-}
-?>
+            <?php foreach ($headers as $header) { ?>
+                <th><?= e($header); ?></th>
+            <?php } ?>
 
         </tr>
     </thead>
 
     <tbody>
 
-<?php while($row = mysqli_fetch_assoc($query)) { ?>
-<tr>
-
-<?php
-
-if ($jenis == 'pasien') {
-    echo "
-        <td>{$row['no_rm']}</td>
-        <td>{$row['nama_pasien']}</td>
-        <td>{$row['jenis_kelamin']}</td>
-        <td>{$row['no_hp']}</td>
-    ";
-}
-
-elseif ($jenis == 'dokter') {
-    echo "
-        <td>{$row['kode_dokter']}</td>
-        <td>{$row['nama_dokter']}</td>
-        <td>{$row['spesialis']}</td>
-        <td>{$row['nama_poli']}</td>
-    ";
-}
-
-elseif ($jenis == 'poli') {
-    echo "
-        <td>{$row['kode_poli']}</td>
-        <td>{$row['nama_poli']}</td>
-        <td>{$row['keterangan']}</td>
-    ";
-}
-
-elseif ($jenis == 'kunjungan') {
-    echo "
-        <td>{$row['kode_kunjungan']}</td>
-        <td>{$row['nama_pasien']}</td>
-        <td>{$row['nama_dokter']}</td>
-        <td>{$row['keluhan']}</td>
-    ";
-}
-
-elseif ($jenis == 'rekam_medis') {
-    echo "
-        <td>{$row['kode_rekam_medis']}</td>
-        <td>{$row['nama_pasien']}</td>
-        <td>{$row['nama_dokter']}</td>
-        <td>{$row['diagnosa']}</td>
-    ";
-}
-
-elseif ($jenis == 'obat') {
-    echo "
-        <td>{$row['kode_obat']}</td>
-        <td>{$row['nama_obat']}</td>
-        <td>{$row['stok']}</td>
-        <td>{$row['harga']}</td>
-    ";
-}
-
-elseif ($jenis == 'tindakan') {
-    echo "
-        <td>{$row['kode_tindakan']}</td>
-        <td>{$row['nama_tindakan']}</td>
-        <td>{$row['biaya']}</td>
-    ";
-}
-
-elseif ($jenis == 'resep') {
-    echo "
-        <td>{$row['kode_resep']}</td>
-        <td>{$row['nama_pasien']}</td>
-        <td>{$row['nama_dokter']}</td>
-        <td>{$row['nama_obat']}</td>
-        <td>{$row['jumlah']}</td>
-    ";
-}
-?>
-
-</tr>
+<?php while ($row = mysqli_fetch_assoc($query)) { ?>
+    <tr>
+        <?php if ($jenis == 'pasien') { ?>
+            <td><?= e($row['no_rm']); ?></td>
+            <td><?= e($row['nama_pasien']); ?></td>
+            <td><?= ($row['jenis_kelamin'] === 'L') ? 'Laki-laki' : 'Perempuan'; ?></td>
+            <td><?= e($row['no_telp']); ?></td>
+            <td><?= e($row['alamat']); ?></td>
+        <?php } elseif ($jenis == 'dokter') { ?>
+            <td><?= e($row['kode_dokter']); ?></td>
+            <td><?= e($row['nama_dokter']); ?></td>
+            <td><?= e($row['spesialisasi']); ?></td>
+            <td><?= e($row['nama_poli']); ?></td>
+            <td><?= e($row['no_sip']); ?></td>
+        <?php } elseif ($jenis == 'poli') { ?>
+            <td><?= e($row['nama_poli']); ?></td>
+            <td><?= e($row['keterangan']); ?></td>
+        <?php } elseif ($jenis == 'kunjungan') { ?>
+            <td><?= e($row['kode_kunjungan']); ?></td>
+            <td><?= e($row['tanggal_kunjungan']); ?></td>
+            <td><?= e($row['nama_pasien']); ?></td>
+            <td><?= e($row['nama_dokter']); ?></td>
+            <td><?= e($row['nama_poli']); ?></td>
+            <td><?= e($row['keluhan_utama']); ?></td>
+            <td><?= e($row['status_kunjungan']); ?></td>
+        <?php } elseif ($jenis == 'rekam_medis') { ?>
+            <td><?= e($row['kode_kunjungan']); ?></td>
+            <td><?= e($row['nama_pasien']); ?></td>
+            <td><?= e($row['nama_dokter']); ?></td>
+            <td><?= e($row['keluhan']); ?></td>
+            <td><?= e($row['diagnosa_kerja']); ?></td>
+            <td><?= e($row['terapi']); ?></td>
+            <td><?= e($row['tanggal_pemeriksaan']); ?></td>
+        <?php } elseif ($jenis == 'obat') { ?>
+            <td><?= e($row['nama_obat']); ?></td>
+            <td><?= e($row['satuan']); ?></td>
+            <td><?= (int) $row['stok']; ?></td>
+            <td><?= number_format((float) $row['harga'], 0, ',', '.'); ?></td>
+            <td><?= e($row['keterangan']); ?></td>
+        <?php } elseif ($jenis == 'tindakan') { ?>
+            <td><?= e($row['nama_tindakan']); ?></td>
+            <td><?= number_format((float) $row['tarif'], 0, ',', '.'); ?></td>
+            <td><?= e($row['keterangan']); ?></td>
+        <?php } elseif ($jenis == 'resep') { ?>
+            <td><?= e($row['kode_kunjungan']); ?></td>
+            <td><?= e($row['nama_pasien']); ?></td>
+            <td><?= e($row['nama_dokter']); ?></td>
+            <td><?= e($row['tanggal_resep']); ?></td>
+            <td><?= e($row['daftar_obat']); ?></td>
+            <td><?= e($row['catatan']); ?></td>
+        <?php } ?>
+    </tr>
 <?php } ?>
 
     </tbody>
 </table>
+
+<?php mysqli_stmt_close($stmt); ?>
 
 <script>
     window.onload = function () {
