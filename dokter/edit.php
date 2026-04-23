@@ -7,16 +7,28 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-$data = mysqli_fetch_assoc(
-    mysqli_query($koneksi, "SELECT * FROM dokter WHERE id='$id'")
-);
+if ($id <= 0) {
+    header("Location: index.php");
+    exit;
+}
 
-$poli = mysqli_query($koneksi, "
-    SELECT * FROM poli
-    ORDER BY nama_poli ASC
-");
+$stmtData = mysqli_prepare($koneksi, "SELECT * FROM dokter WHERE id = ?");
+mysqli_stmt_bind_param($stmtData, "i", $id);
+mysqli_stmt_execute($stmtData);
+$resultData = mysqli_stmt_get_result($stmtData);
+$data = mysqli_fetch_assoc($resultData);
+
+if (!$data) {
+    mysqli_stmt_close($stmtData);
+    header("Location: index.php");
+    exit;
+}
+
+$stmtPoli = mysqli_prepare($koneksi, "SELECT id, nama_poli FROM poli ORDER BY nama_poli ASC");
+mysqli_stmt_execute($stmtPoli);
+$poli = mysqli_stmt_get_result($stmtPoli);
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +53,7 @@ $poli = mysqli_query($koneksi, "
             <input type="text"
                    name="kode_dokter"
                    class="form-control"
-                   value="<?= $data['kode_dokter']; ?>"
+                     value="<?= htmlspecialchars($data['kode_dokter'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
@@ -50,7 +62,7 @@ $poli = mysqli_query($koneksi, "
             <input type="text"
                    name="nama_dokter"
                    class="form-control"
-                   value="<?= $data['nama_dokter']; ?>"
+                     value="<?= htmlspecialchars($data['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
@@ -74,7 +86,7 @@ $poli = mysqli_query($koneksi, "
             <input type="text"
                    name="spesialisasi"
                    class="form-control"
-                   value="<?= $data['spesialisasi']; ?>">
+                     value="<?= htmlspecialchars($data['spesialisasi'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
@@ -82,7 +94,7 @@ $poli = mysqli_query($koneksi, "
             <input type="text"
                    name="no_sip"
                    class="form-control"
-                   value="<?= $data['no_sip']; ?>">
+                     value="<?= htmlspecialchars($data['no_sip'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
@@ -90,13 +102,13 @@ $poli = mysqli_query($koneksi, "
             <input type="text"
                    name="no_telp"
                    class="form-control"
-                   value="<?= $data['no_telp']; ?>">
+                     value="<?= htmlspecialchars($data['no_telp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
             <label>Alamat</label>
             <textarea name="alamat"
-                      class="form-control"><?= $data['alamat']; ?></textarea>
+                      class="form-control"><?= htmlspecialchars($data['alamat'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         </div>
 
         <div class="mb-2">
@@ -109,7 +121,7 @@ $poli = mysqli_query($koneksi, "
                 <?php while($row = mysqli_fetch_assoc($poli)) { ?>
                     <option value="<?= $row['id']; ?>"
                         <?= ($row['id'] == $data['poli_id']) ? 'selected' : ''; ?>>
-                        <?= $row['nama_poli']; ?>
+                        <?= htmlspecialchars($row['nama_poli'], ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php } ?>
 
@@ -147,6 +159,9 @@ $poli = mysqli_query($koneksi, "
         </a>
 
     </form>
+
+    <?php mysqli_stmt_close($stmtData); ?>
+    <?php mysqli_stmt_close($stmtPoli); ?>
 
 </div>
 

@@ -7,10 +7,9 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT * FROM obat
-    ORDER BY id DESC
-");
+$stmt = mysqli_prepare($koneksi, "SELECT id, nama_obat, satuan, stok, harga, keterangan FROM obat ORDER BY id DESC");
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -41,9 +40,7 @@ $data = mysqli_query($koneksi, "
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Obat</th>
                 <th>Nama Obat</th>
-                <th>Kategori</th>
                 <th>Satuan</th>
                 <th>Stok</th>
                 <th>Harga</th>
@@ -58,13 +55,11 @@ $data = mysqli_query($koneksi, "
 
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_obat']; ?></td>
-                <td><?= $row['nama_obat']; ?></td>
-                <td><?= $row['kategori_obat']; ?></td>
-                <td><?= $row['satuan']; ?></td>
-                <td><?= $row['stok']; ?></td>
-                <td><?= $row['harga']; ?></td>
-                <td><?= $row['keterangan']; ?></td>
+                <td><?= htmlspecialchars($row['nama_obat'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['satuan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= (int) $row['stok']; ?></td>
+                <td><?= number_format((float) $row['harga'], 0, ',', '.'); ?></td>
+                <td><?= htmlspecialchars($row['keterangan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
                 <td>
 
                     <a href="edit.php?id=<?= $row['id']; ?>"
@@ -85,6 +80,8 @@ $data = mysqli_query($koneksi, "
 
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

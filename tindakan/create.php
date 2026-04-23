@@ -23,14 +23,6 @@ if (!isset($_SESSION['id'])) {
     <form action="proses.php" method="POST">
 
         <div class="mb-2">
-            <label>Kode Tindakan</label>
-            <input type="text"
-                   name="kode_tindakan"
-                   class="form-control"
-                   required>
-        </div>
-
-        <div class="mb-2">
             <label>Nama Tindakan</label>
             <input type="text"
                    name="nama_tindakan"
@@ -39,16 +31,10 @@ if (!isset($_SESSION['id'])) {
         </div>
 
         <div class="mb-2">
-            <label>Kategori Tindakan</label>
-            <input type="text"
-                   name="kategori_tindakan"
-                   class="form-control">
-        </div>
-
-        <div class="mb-2">
-            <label>Biaya</label>
+                 <label>Tarif</label>
             <input type="number"
-                   name="biaya"
+                     step="0.01"
+                     name="tarif"
                    class="form-control"
                    required>
         </div>

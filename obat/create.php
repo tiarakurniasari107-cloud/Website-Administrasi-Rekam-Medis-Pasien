@@ -23,26 +23,11 @@ if (!isset($_SESSION['id'])) {
     <form action="proses.php" method="POST">
 
         <div class="mb-2">
-            <label>Kode Obat</label>
-            <input type="text"
-                   name="kode_obat"
-                   class="form-control"
-                   required>
-        </div>
-
-        <div class="mb-2">
             <label>Nama Obat</label>
             <input type="text"
                    name="nama_obat"
                    class="form-control"
                    required>
-        </div>
-
-        <div class="mb-2">
-            <label>Kategori Obat</label>
-            <input type="text"
-                   name="kategori_obat"
-                   class="form-control">
         </div>
 
         <div class="mb-2">

@@ -1,43 +1,65 @@
 <?php
+session_start();
 require_once '../config/koneksi.php';
 
-if (isset($_POST['simpan'])) {
-
-    $kode_resep       = $_POST['kode_resep'];
-    $rekam_medis_id   = $_POST['rekam_medis_id'];
-    $pasien_id        = $_POST['pasien_id'];
-    $dokter_id        = $_POST['dokter_id'];
-    $obat_id          = $_POST['obat_id'];
-    $dosis            = $_POST['dosis'];
-    $aturan_pakai     = $_POST['aturan_pakai'];
-    $jumlah           = $_POST['jumlah'];
-    $catatan          = $_POST['catatan'];
-
-    mysqli_query($koneksi, "
-        INSERT INTO resep (
-            kode_resep,
-            rekam_medis_id,
-            pasien_id,
-            dokter_id,
-            obat_id,
-            dosis,
-            aturan_pakai,
-            jumlah,
-            catatan
-        ) VALUES (
-            '$kode_resep',
-            '$rekam_medis_id',
-            '$pasien_id',
-            '$dokter_id',
-            '$obat_id',
-            '$dosis',
-            '$aturan_pakai',
-            '$jumlah',
-            '$catatan'
-        )
-    ");
-
-    header("Location: index.php");
+if (!isset($_SESSION['id'])) {
+    header('Location: ../auth/login.php');
     exit;
 }
-?>
+
+if (isset($_POST['simpan'])) {
+    $rekam_medis_id = isset($_POST['rekam_medis_id']) ? (int) $_POST['rekam_medis_id'] : 0;
+    $tanggal_resep = trim($_POST['tanggal_resep'] ?? '');
+    $obat_id = isset($_POST['obat_id']) ? (int) $_POST['obat_id'] : 0;
+    $dosis = trim($_POST['dosis'] ?? '');
+    $jumlah = isset($_POST['jumlah']) ? (int) $_POST['jumlah'] : 0;
+    $aturan_pakai = trim($_POST['aturan_pakai'] ?? '');
+    $catatan = trim($_POST['catatan'] ?? '');
+
+    if ($rekam_medis_id <= 0 || $obat_id <= 0 || $dosis === '' || $aturan_pakai === '' || $jumlah <= 0) {
+        header('Location: create.php');
+        exit;
+    }
+
+    mysqli_begin_transaction($koneksi);
+
+    $ok = true;
+
+    if ($tanggal_resep === '') {
+        $stmtResep = mysqli_prepare(
+            $koneksi,
+            "INSERT INTO resep (rekam_medis_id, catatan) VALUES (?, NULLIF(?, ''))"
+        );
+        mysqli_stmt_bind_param($stmtResep, 'is', $rekam_medis_id, $catatan);
+    } else {
+        $stmtResep = mysqli_prepare(
+            $koneksi,
+            "INSERT INTO resep (rekam_medis_id, tanggal_resep, catatan) VALUES (?, ?, NULLIF(?, ''))"
+        );
+        mysqli_stmt_bind_param($stmtResep, 'iss', $rekam_medis_id, $tanggal_resep, $catatan);
+    }
+
+    $ok = $ok && mysqli_stmt_execute($stmtResep);
+    $resep_id = mysqli_insert_id($koneksi);
+    mysqli_stmt_close($stmtResep);
+
+    if ($ok) {
+        $stmtDetail = mysqli_prepare(
+            $koneksi,
+            'INSERT INTO resep_detail (resep_id, obat_id, dosis, jumlah, aturan_pakai) VALUES (?, ?, ?, ?, ?)'
+        );
+        mysqli_stmt_bind_param($stmtDetail, 'iisis', $resep_id, $obat_id, $dosis, $jumlah, $aturan_pakai);
+        $ok = $ok && mysqli_stmt_execute($stmtDetail);
+        mysqli_stmt_close($stmtDetail);
+    }
+
+    if ($ok) {
+        mysqli_commit($koneksi);
+        header('Location: index.php');
+        exit;
+    }
+
+    mysqli_rollback($koneksi);
+    header('Location: create.php');
+    exit;
+}

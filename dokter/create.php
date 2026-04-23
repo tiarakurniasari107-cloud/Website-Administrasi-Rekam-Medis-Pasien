@@ -7,10 +7,9 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$poli = mysqli_query($koneksi, "
-    SELECT * FROM poli
-    ORDER BY nama_poli ASC
-");
+$stmtPoli = mysqli_prepare($koneksi, "SELECT id, nama_poli FROM poli ORDER BY nama_poli ASC");
+mysqli_stmt_execute($stmtPoli);
+$poli = mysqli_stmt_get_result($stmtPoli);
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +81,7 @@ $poli = mysqli_query($koneksi, "
 
                 <?php while($row = mysqli_fetch_assoc($poli)) { ?>
                     <option value="<?= $row['id']; ?>">
-                        <?= $row['nama_poli']; ?>
+                        <?= htmlspecialchars($row['nama_poli'], ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php } ?>
 
@@ -110,6 +109,8 @@ $poli = mysqli_query($koneksi, "
         </a>
 
     </form>
+
+    <?php mysqli_stmt_close($stmtPoli); ?>
 
 </div>
 

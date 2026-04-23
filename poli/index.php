@@ -7,10 +7,9 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$data = mysqli_query($koneksi, "
-    SELECT * FROM poli
-    ORDER BY id DESC
-");
+$stmt = mysqli_prepare($koneksi, "SELECT id, nama_poli, keterangan FROM poli ORDER BY id DESC");
+mysqli_stmt_execute($stmt);
+$data = mysqli_stmt_get_result($stmt);
 ?>
 
 <!DOCTYPE html>
@@ -51,9 +50,8 @@ $data = mysqli_query($koneksi, "
 
             <tr>
                 <td><?= $no++; ?></td>
-                <td><?= $row['kode_poli']; ?></td>
-                <td><?= $row['nama_poli']; ?></td>
-                <td><?= $row['keterangan']; ?></td>
+                <td><?= htmlspecialchars($row['nama_poli'], ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars($row['keterangan'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
                 <td>
 
                     <a href="edit.php?id=<?= $row['id']; ?>"
@@ -74,6 +72,8 @@ $data = mysqli_query($koneksi, "
 
         </tbody>
     </table>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

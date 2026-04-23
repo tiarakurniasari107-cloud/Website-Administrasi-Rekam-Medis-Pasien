@@ -7,14 +7,24 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-$data = mysqli_fetch_assoc(
-    mysqli_query($koneksi, "
-        SELECT * FROM poli
-        WHERE id = '$id'
-    ")
-);
+if ($id <= 0) {
+    header("Location: index.php");
+    exit;
+}
+
+$stmt = mysqli_prepare($koneksi, "SELECT id, nama_poli, keterangan FROM poli WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
+
+if (!$data) {
+    mysqli_stmt_close($stmt);
+    header("Location: index.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,14 +49,14 @@ $data = mysqli_fetch_assoc(
             <input type="text"
                    name="nama_poli"
                    class="form-control"
-                   value="<?= $data['nama_poli']; ?>"
+                     value="<?= htmlspecialchars($data['nama_poli'], ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
         <div class="mb-2">
             <label>Keterangan</label>
             <textarea name="keterangan"
-                      class="form-control"><?= $data['keterangan']; ?></textarea>
+                      class="form-control"><?= htmlspecialchars($data['keterangan'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         </div>
 
         <button type="submit"
@@ -61,6 +71,8 @@ $data = mysqli_fetch_assoc(
         </a>
 
     </form>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

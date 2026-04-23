@@ -7,11 +7,24 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-$data = mysqli_fetch_assoc(
-    mysqli_query($koneksi, "SELECT * FROM pasien WHERE id='$id'")
-);
+if ($id <= 0) {
+    header("Location: index.php");
+    exit;
+}
+
+$stmt = mysqli_prepare($koneksi, "SELECT * FROM pasien WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
+
+if (!$data) {
+    mysqli_stmt_close($stmt);
+    header("Location: index.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,19 +47,19 @@ $data = mysqli_fetch_assoc(
         <div class="mb-2">
             <label>No RM</label>
             <input type="text" name="no_rm" class="form-control"
-                   value="<?= $data['no_rm']; ?>" required>
+                   value="<?= htmlspecialchars($data['no_rm'], ENT_QUOTES, 'UTF-8'); ?>" required>
         </div>
 
         <div class="mb-2">
             <label>NIK</label>
             <input type="text" name="nik" class="form-control"
-                   value="<?= $data['nik']; ?>">
+                   value="<?= htmlspecialchars($data['nik'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
             <label>Nama Pasien</label>
             <input type="text" name="nama_pasien" class="form-control"
-                   value="<?= $data['nama_pasien']; ?>" required>
+                   value="<?= htmlspecialchars($data['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?>" required>
         </div>
 
         <div class="mb-2">
@@ -64,30 +77,30 @@ $data = mysqli_fetch_assoc(
         <div class="mb-2">
             <label>Tempat Lahir</label>
             <input type="text" name="tempat_lahir" class="form-control"
-                   value="<?= $data['tempat_lahir']; ?>">
+                   value="<?= htmlspecialchars($data['tempat_lahir'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
             <label>Tanggal Lahir</label>
             <input type="date" name="tanggal_lahir" class="form-control"
-                   value="<?= $data['tanggal_lahir']; ?>">
+                   value="<?= htmlspecialchars($data['tanggal_lahir'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
             <label>Umur</label>
             <input type="number" name="umur" class="form-control"
-                   value="<?= $data['umur']; ?>">
+                   value="<?= htmlspecialchars((string) ($data['umur'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
             <label>Alamat</label>
-            <textarea name="alamat" class="form-control"><?= $data['alamat']; ?></textarea>
+            <textarea name="alamat" class="form-control"><?= htmlspecialchars($data['alamat'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         </div>
 
         <div class="mb-2">
             <label>No Telepon</label>
             <input type="text" name="no_telp" class="form-control"
-                   value="<?= $data['no_telp']; ?>">
+                   value="<?= htmlspecialchars($data['no_telp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
@@ -103,19 +116,19 @@ $data = mysqli_fetch_assoc(
 
         <div class="mb-2">
             <label>Alergi</label>
-            <textarea name="alergi" class="form-control"><?= $data['alergi']; ?></textarea>
+            <textarea name="alergi" class="form-control"><?= htmlspecialchars($data['alergi'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         </div>
 
         <div class="mb-2">
             <label>Status Kawin</label>
             <input type="text" name="status_kawin" class="form-control"
-                   value="<?= $data['status_kawin']; ?>">
+                   value="<?= htmlspecialchars($data['status_kawin'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <div class="mb-2">
             <label>Pekerjaan</label>
             <input type="text" name="pekerjaan" class="form-control"
-                   value="<?= $data['pekerjaan']; ?>">
+                   value="<?= htmlspecialchars($data['pekerjaan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         </div>
 
         <button type="submit" name="update" class="btn btn-success">
@@ -129,6 +142,8 @@ $data = mysqli_fetch_assoc(
     </form>
 
 </div>
+
+<?php mysqli_stmt_close($stmt); ?>
 
 </body>
 </html>

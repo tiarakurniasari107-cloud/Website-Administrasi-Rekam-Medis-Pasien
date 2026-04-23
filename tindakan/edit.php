@@ -7,12 +7,24 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-$data = mysqli_fetch_assoc(mysqli_query($koneksi, "
-    SELECT * FROM tindakan
-    WHERE id = '$id'
-"));
+if ($id <= 0) {
+    header("Location: index.php");
+    exit;
+}
+
+$stmt = mysqli_prepare($koneksi, "SELECT id, nama_tindakan, tarif, keterangan FROM tindakan WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
+
+if (!$data) {
+    mysqli_stmt_close($stmt);
+    header("Location: index.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,44 +46,28 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "
         <input type="hidden" name="id" value="<?= $data['id']; ?>">
 
         <div class="mb-2">
-            <label>Kode Tindakan</label>
-            <input type="text"
-                   name="kode_tindakan"
-                   class="form-control"
-                   value="<?= $data['kode_tindakan']; ?>"
-                   required>
-        </div>
-
-        <div class="mb-2">
             <label>Nama Tindakan</label>
             <input type="text"
                    name="nama_tindakan"
                    class="form-control"
-                   value="<?= $data['nama_tindakan']; ?>"
+                 value="<?= htmlspecialchars($data['nama_tindakan'], ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
         <div class="mb-2">
-            <label>Kategori Tindakan</label>
-            <input type="text"
-                   name="kategori_tindakan"
-                   class="form-control"
-                   value="<?= $data['kategori_tindakan']; ?>">
-        </div>
-
-        <div class="mb-2">
-            <label>Biaya</label>
+             <label>Tarif</label>
             <input type="number"
-                   name="biaya"
+                 step="0.01"
+                 name="tarif"
                    class="form-control"
-                   value="<?= $data['biaya']; ?>"
+                 value="<?= htmlspecialchars((string) $data['tarif'], ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
         <div class="mb-2">
             <label>Keterangan</label>
             <textarea name="keterangan"
-                      class="form-control"><?= $data['keterangan']; ?></textarea>
+                      class="form-control"><?= htmlspecialchars($data['keterangan'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         </div>
 
         <button type="submit"
@@ -86,6 +82,8 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "
         </a>
 
     </form>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 

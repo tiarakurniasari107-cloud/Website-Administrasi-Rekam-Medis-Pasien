@@ -7,12 +7,24 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-$data = mysqli_fetch_assoc(mysqli_query($koneksi, "
-    SELECT * FROM obat
-    WHERE id = '$id'
-"));
+if ($id <= 0) {
+    header("Location: index.php");
+    exit;
+}
+
+$stmt = mysqli_prepare($koneksi, "SELECT id, nama_obat, satuan, stok, harga, keterangan FROM obat WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
+
+if (!$data) {
+    mysqli_stmt_close($stmt);
+    header("Location: index.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,29 +46,12 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "
         <input type="hidden" name="id" value="<?= $data['id']; ?>">
 
         <div class="mb-2">
-            <label>Kode Obat</label>
-            <input type="text"
-                   name="kode_obat"
-                   class="form-control"
-                   value="<?= $data['kode_obat']; ?>"
-                   required>
-        </div>
-
-        <div class="mb-2">
             <label>Nama Obat</label>
             <input type="text"
                    name="nama_obat"
                    class="form-control"
-                   value="<?= $data['nama_obat']; ?>"
+                   value="<?= htmlspecialchars($data['nama_obat'], ENT_QUOTES, 'UTF-8'); ?>"
                    required>
-        </div>
-
-        <div class="mb-2">
-            <label>Kategori Obat</label>
-            <input type="text"
-                   name="kategori_obat"
-                   class="form-control"
-                   value="<?= $data['kategori_obat']; ?>">
         </div>
 
         <div class="mb-2">
@@ -64,7 +59,7 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "
             <input type="text"
                    name="satuan"
                    class="form-control"
-                   value="<?= $data['satuan']; ?>"
+                     value="<?= htmlspecialchars($data['satuan'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
@@ -73,23 +68,24 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "
             <input type="number"
                    name="stok"
                    class="form-control"
-                   value="<?= $data['stok']; ?>"
+                     value="<?= (int) $data['stok']; ?>"
                    required>
         </div>
 
         <div class="mb-2">
             <label>Harga</label>
             <input type="number"
+                     step="0.01"
                    name="harga"
                    class="form-control"
-                   value="<?= $data['harga']; ?>"
+                     value="<?= htmlspecialchars((string) $data['harga'], ENT_QUOTES, 'UTF-8'); ?>"
                    required>
         </div>
 
         <div class="mb-2">
             <label>Keterangan</label>
             <textarea name="keterangan"
-                      class="form-control"><?= $data['keterangan']; ?></textarea>
+                      class="form-control"><?= htmlspecialchars($data['keterangan'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
         </div>
 
         <button type="submit"
@@ -104,6 +100,8 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "
         </a>
 
     </form>
+
+    <?php mysqli_stmt_close($stmt); ?>
 
 </div>
 
