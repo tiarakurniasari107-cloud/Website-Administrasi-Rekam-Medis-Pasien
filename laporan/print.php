@@ -11,6 +11,40 @@ $jenis = $_GET['jenis'] ?? '';
 $title = 'Laporan Data';
 $headers = [];
 $sql = '';
+$types = '';
+$params = [];
+
+function normalizeDate($value)
+{
+    $value = trim((string) $value);
+    if ($value === '') {
+        return '';
+    }
+
+    $date = DateTime::createFromFormat('Y-m-d', $value);
+    if (!$date || $date->format('Y-m-d') !== $value) {
+        return '';
+    }
+
+    return $value;
+}
+
+$tanggal_awal = normalizeDate($_GET['tanggal_awal'] ?? '');
+$tanggal_akhir = normalizeDate($_GET['tanggal_akhir'] ?? '');
+
+function bindParams($stmt, $types, &$params)
+{
+    if ($types === '') {
+        return;
+    }
+
+    $args = [$stmt, $types];
+    foreach ($params as $key => $value) {
+        $args[] = &$params[$key];
+    }
+
+    call_user_func_array('mysqli_stmt_bind_param', $args);
+}
 
 if (!in_array($jenis, ['pasien', 'dokter', 'poli', 'kunjungan', 'rekam_medis', 'obat', 'tindakan', 'resep'], true)) {
     die('Jenis laporan tidak ditemukan.');
@@ -45,8 +79,22 @@ switch ($jenis) {
                 FROM kunjungan k
                 INNER JOIN pasien p ON k.pasien_id = p.id
                 INNER JOIN dokter d ON k.dokter_id = d.id
-                LEFT JOIN poli pl ON k.poli_id = pl.id
-                ORDER BY k.id DESC";
+                LEFT JOIN poli pl ON k.poli_id = pl.id";
+
+        if ($tanggal_awal !== '') {
+            $sql .= ' WHERE DATE(k.tanggal_kunjungan) >= ?';
+            $types .= 's';
+            $params[] = $tanggal_awal;
+        }
+
+        if ($tanggal_akhir !== '') {
+            $sql .= ($tanggal_awal !== '') ? ' AND ' : ' WHERE ';
+            $sql .= 'DATE(k.tanggal_kunjungan) <= ?';
+            $types .= 's';
+            $params[] = $tanggal_akhir;
+        }
+
+        $sql .= ' ORDER BY k.id DESC';
         break;
 
     case 'rekam_medis':
@@ -56,8 +104,22 @@ switch ($jenis) {
                 FROM rekam_medis rm
                 INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
                 INNER JOIN pasien p ON k.pasien_id = p.id
-                INNER JOIN dokter d ON k.dokter_id = d.id
-                ORDER BY rm.id DESC";
+                INNER JOIN dokter d ON k.dokter_id = d.id";
+
+        if ($tanggal_awal !== '') {
+            $sql .= ' WHERE DATE(rm.tanggal_pemeriksaan) >= ?';
+            $types .= 's';
+            $params[] = $tanggal_awal;
+        }
+
+        if ($tanggal_akhir !== '') {
+            $sql .= ($tanggal_awal !== '') ? ' AND ' : ' WHERE ';
+            $sql .= 'DATE(rm.tanggal_pemeriksaan) <= ?';
+            $types .= 's';
+            $params[] = $tanggal_akhir;
+        }
+
+        $sql .= ' ORDER BY rm.id DESC';
         break;
 
     case 'obat':
@@ -84,19 +146,60 @@ switch ($jenis) {
                 INNER JOIN pasien p ON k.pasien_id = p.id
                 INNER JOIN dokter d ON k.dokter_id = d.id
                 LEFT JOIN resep_detail rd ON rd.resep_id = r.id
-                LEFT JOIN obat o ON rd.obat_id = o.id
-                GROUP BY r.id, k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep, r.catatan
-                ORDER BY r.id DESC";
+                LEFT JOIN obat o ON rd.obat_id = o.id";
+
+        if ($tanggal_awal !== '') {
+            $sql .= ' WHERE DATE(r.tanggal_resep) >= ?';
+            $types .= 's';
+            $params[] = $tanggal_awal;
+        }
+
+        if ($tanggal_akhir !== '') {
+            $sql .= ($tanggal_awal !== '') ? ' AND ' : ' WHERE ';
+            $sql .= 'DATE(r.tanggal_resep) <= ?';
+            $types .= 's';
+            $params[] = $tanggal_akhir;
+        }
+
+        $sql .= ' GROUP BY r.id, k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep, r.catatan';
+        $sql .= ' ORDER BY r.id DESC';
         break;
 }
 
 $stmt = mysqli_prepare($koneksi, $sql);
+bindParams($stmt, $types, $params);
 mysqli_stmt_execute($stmt);
 $query = mysqli_stmt_get_result($stmt);
 
 function e($value)
 {
     return htmlspecialchars((string) ($value ?? '-'), ENT_QUOTES, 'UTF-8');
+}
+
+function formatPeriode($tanggal)
+{
+    if ($tanggal === '') {
+        return '';
+    }
+
+    $date = DateTime::createFromFormat('Y-m-d', $tanggal);
+    if (!$date) {
+        return '';
+    }
+
+    return $date->format('d-m-Y');
+}
+
+$periode_awal = formatPeriode($tanggal_awal);
+$periode_akhir = formatPeriode($tanggal_akhir);
+$periode_label = '';
+
+if ($periode_awal !== '' && $periode_akhir !== '') {
+    $periode_label = $periode_awal . ' s/d ' . $periode_akhir;
+} elseif ($periode_awal !== '') {
+    $periode_label = 'Mulai ' . $periode_awal;
+} elseif ($periode_akhir !== '') {
+    $periode_label = 'Sampai ' . $periode_akhir;
 }
 ?>
 
@@ -138,6 +241,9 @@ function e($value)
 </div>
 
 <h2><?= $title; ?></h2>
+<?php if ($periode_label !== '') { ?>
+    <p class="text-center mb-4"><strong>Periode:</strong> <?= e($periode_label); ?></p>
+<?php } ?>
 
 <table class="table table-bordered">
     <thead>
