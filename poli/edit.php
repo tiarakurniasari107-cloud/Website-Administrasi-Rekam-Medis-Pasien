@@ -26,45 +26,42 @@ $pageTitle = 'Edit Poli';
 require_once '../includes/header.php';
 ?>
 
+<div class="container">
+    <section class="page-header">
+        <h2>Edit Poli</h2>
+        <p>Ubah data poliklinik</p>
+    </section>
 
-<div class="container mt-4">
-
-    <h2>Edit Poli</h2>
-
-    <form action="proses_edit.php" method="POST">
-
-        <input type="hidden" name="id" value="<?= $data['id']; ?>">
-
-        <div class="mb-2">
-            <label>Nama Poli</label>
-            <input type="text"
-                   name="nama_poli"
-                   class="form-control"
-                     value="<?= htmlspecialchars($data['nama_poli'], ENT_QUOTES, 'UTF-8'); ?>"
-                   required>
+    <section class="content-card form-card">
+        <div class="toolbar-row">
+            <div class="toolbar-actions">
+                <a href="index.php" class="btn btn-back"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Kembali</a>
+            </div>
         </div>
 
-        <div class="mb-2">
-            <label>Keterangan</label>
-            <textarea name="keterangan"
-                      class="form-control"><?= htmlspecialchars($data['keterangan'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
-        </div>
+        <form action="proses_edit.php" method="POST" autocomplete="off">
+            <input type="hidden" name="id" value="<?= $data['id']; ?>">
 
-        <button type="submit"
-                name="update"
-                class="btn btn-success">
-            Update
-        </button>
+            <div class="form-grid">
+                <div class="mb-2 field-full">
+                    <label for="nama_poli">Nama Poli</label>
+                    <input type="text" id="nama_poli" name="nama_poli" class="form-control" value="<?= htmlspecialchars($data['nama_poli'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                </div>
 
-        <a href="index.php"
-           class="btn btn-secondary">
-            Kembali
-        </a>
+                <div class="mb-2 field-full">
+                    <label for="keterangan">Keterangan</label>
+                    <textarea id="keterangan" name="keterangan" class="form-control"><?= htmlspecialchars($data['keterangan'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                </div>
+            </div>
 
-    </form>
+            <div class="form-actions">
+                <button type="submit" name="update" class="btn btn-primary">Update</button>
+                <a href="index.php" class="btn btn-secondary">Kembali</a>
+            </div>
+        </form>
 
-    <?php mysqli_stmt_close($stmt); ?>
-
+        <?php mysqli_stmt_close($stmt); ?>
+    </section>
 </div>
 
 <?php require_once '../includes/footer.php'; ?>

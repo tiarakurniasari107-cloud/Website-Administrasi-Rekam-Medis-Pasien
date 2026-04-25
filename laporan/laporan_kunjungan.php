@@ -72,6 +72,7 @@ $stmt = mysqli_prepare($koneksi, $sql);
 bindParams($stmt, $types, $params);
 mysqli_stmt_execute($stmt);
 $data = mysqli_stmt_get_result($stmt);
+$totalRows = (int) mysqli_num_rows($data);
 
 $printParams = ['jenis' => 'kunjungan'];
 if ($tanggal_awal !== '') {
@@ -88,83 +89,82 @@ $pageTitle = 'Laporan Kunjungan';
 require_once '../includes/header.php';
 ?>
 
+<div class="container">
+    <section class="page-header">
+        <h2>Laporan Kunjungan</h2>
+        <p>Daftar lengkap data kunjungan pasien klinik</p>
+    </section>
 
-<div class="container mt-4">
-
-    <h2>Laporan Kunjungan</h2>
-
-    <a href="index.php" class="btn btn-secondary">
-        Kembali
-    </a>
-
-    <form method="GET" class="row g-2 align-items-end mt-3 mb-3">
-        <div class="col-md-3">
-            <label for="tanggal_awal" class="form-label">Tanggal Awal</label>
-            <input
-                type="date"
-                id="tanggal_awal"
-                name="tanggal_awal"
-                class="form-control"
-                value="<?= htmlspecialchars($tanggal_awal, ENT_QUOTES, 'UTF-8'); ?>"
-            >
+    <section class="content-card">
+        <div class="toolbar-row">
+            <div class="toolbar-actions">
+                <a href="index.php" class="btn btn-back"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Kembali</a>
+                <a href="<?= htmlspecialchars($printUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" class="btn btn-primary"><span class="glyphicon glyphicon-print" aria-hidden="true"></span>Print</a>
+            </div>
         </div>
 
-        <div class="col-md-3">
-            <label for="tanggal_akhir" class="form-label">Tanggal Akhir</label>
-            <input
-                type="date"
-                id="tanggal_akhir"
-                name="tanggal_akhir"
-                class="form-control"
-                value="<?= htmlspecialchars($tanggal_akhir, ENT_QUOTES, 'UTF-8'); ?>"
-            >
+        <div class="filter-panel">
+            <form method="GET">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="tanggal_awal" class="form-label">Tanggal Awal</label>
+                        <input type="date" id="tanggal_awal" name="tanggal_awal" class="form-control" value="<?= htmlspecialchars($tanggal_awal, ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="tanggal_akhir" class="form-label">Tanggal Akhir</label>
+                        <input type="date" id="tanggal_akhir" name="tanggal_akhir" class="form-control" value="<?= htmlspecialchars($tanggal_akhir, ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label" style="opacity:0;">Filter</label>
+                        <div class="toolbar-actions">
+                            <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+                            <a href="laporan_kunjungan.php" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
 
-        <div class="col-md-6">
-            <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-            <a href="laporan_kunjungan.php" class="btn btn-outline-secondary">Reset</a>
-            <a href="<?= htmlspecialchars($printUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" class="btn btn-success">Print</a>
+        <div class="report-summary">
+            Total: <strong><?= $totalRows; ?></strong> Data
         </div>
-    </form>
 
-    <br>
+        <div class="table-wrapper">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode Kunjungan</th>
+                        <th>Tanggal</th>
+                        <th>Pasien</th>
+                        <th>Dokter</th>
+                        <th>Poli</th>
+                        <th>Keluhan Utama</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode Kunjungan</th>
-                <th>Tanggal</th>
-                <th>Pasien</th>
-                <th>Dokter</th>
-                <th>Poli</th>
-                <th>Keluhan Utama</th>
-                <th>Status</th>
-            </tr>
-        </thead>
+                <tbody>
+                <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
+                    <tr>
+                        <td><?= $no++; ?></td>
+                        <td><span class="table-key"><?= htmlspecialchars($row['kode_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></span></td>
+                        <td><?= htmlspecialchars($row['tanggal_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars($row['nama_poli'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars($row['keluhan_utama'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars($row['status_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
 
-        <tbody>
-
-        <?php $no = 1; while($row = mysqli_fetch_assoc($data)) { ?>
-
-            <tr>
-                <td><?= $no++; ?></td>
-                <td><?= htmlspecialchars($row['kode_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?= htmlspecialchars($row['tanggal_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?= htmlspecialchars($row['nama_poli'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?= htmlspecialchars($row['keluhan_utama'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?= htmlspecialchars($row['status_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
-            </tr>
-
-        <?php } ?>
-
-        </tbody>
-    </table>
-
-    <?php mysqli_stmt_close($stmt); ?>
-
+        <?php mysqli_stmt_close($stmt); ?>
+    </section>
 </div>
 
 <?php require_once '../includes/footer.php'; ?>

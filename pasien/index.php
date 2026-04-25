@@ -86,72 +86,89 @@ $pageTitle = 'Data Pasien';
 require_once '../includes/header.php';
 ?>
 
-
-    <div class="container mt-4">
-
+<div class="container">
+    <section class="page-header">
         <h2>Data Pasien</h2>
+        <p>Kelola data rekam medis pasien</p>
+    </section>
 
-        <a href="../dashboard/index.php" class="btn btn-secondary">Kembali</a>
-        <a href="create.php" class="btn btn-primary">+ Tambah Pasien</a>
-
-        <br><br>
-
-        <form method="GET">
-            <div class="row">
-                <div class="col-md-4">
-                    <input type="text" name="keyword" class="form-control" placeholder="Cari nama / no RM / NIK" value="<?= htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8'); ?>">
-                </div>
-
-                <div class="col-md-3">
-                    <select name="jk" class="form-control">
-                        <option value="">Semua Gender</option>
-                        <option value="L" <?= ($jk === 'L') ? 'selected' : ''; ?>>Laki-laki</option>
-                        <option value="P" <?= ($jk === 'P') ? 'selected' : ''; ?>>Perempuan</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <button class="btn btn-success">Search</button>
-                </div>
-
-                <div class="col-md-2">
-                    <a href="index.php" class="btn btn-danger">Reset</a>
-                </div>
+    <section class="content-card">
+        <div class="toolbar-row">
+            <div class="toolbar-actions">
+                <a href="../dashboard/index.php" class="btn btn-back"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Kembali</a>
             </div>
-        </form>
 
-        <br>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>No RM</th>
-                    <th>Nama</th>
-                    <th>JK</th>
-                    <th>No Telepon</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
+            <div class="toolbar-actions">
+                <a href="create.php" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Tambah Pasien</a>
+            </div>
+        </div>
 
-            <tbody>
-                <?php
-                $no = $start + 1;
-                while ($row = mysqli_fetch_assoc($data)) {
-                ?>
+        <div class="filter-panel">
+            <form method="GET">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" name="keyword" class="form-control" placeholder="Cari nama / no RM / NIK" value="<?= htmlspecialchars($keyword, ENT_QUOTES, 'UTF-8'); ?>">
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="jk" class="form-control">
+                            <option value="">Semua Gender</option>
+                            <option value="L" <?= ($jk === 'L') ? 'selected' : ''; ?>>Laki-laki</option>
+                            <option value="P" <?= ($jk === 'P') ? 'selected' : ''; ?>>Perempuan</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+
+                    <div class="col-md-2">
+                        <a href="index.php" class="btn btn-danger">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <td><?= $no++; ?></td>
-                        <td><?= htmlspecialchars($row['no_rm'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= ($row['jenis_kelamin'] === 'L') ? 'Laki-laki' : 'Perempuan'; ?></td>
-                        <td><?= htmlspecialchars($row['no_telp'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td>
-                            <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="delete.php?id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">Hapus</a>
-                        </td>
+                        <th>No</th>
+                        <th>No RM</th>
+                        <th>Nama</th>
+                        <th>JK</th>
+                        <th>No Telepon</th>
+                        <th>Aksi</th>
                     </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    <?php
+                    $no = $start + 1;
+                    while ($row = mysqli_fetch_assoc($data)) {
+                        $isLakiLaki = ($row['jenis_kelamin'] === 'L');
+                    ?>
+                        <tr>
+                            <td><?= $no++; ?></td>
+                            <td><span class="table-key"><?= htmlspecialchars($row['no_rm'], ENT_QUOTES, 'UTF-8'); ?></span></td>
+                            <td><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td>
+                                <span class="gender-badge <?= $isLakiLaki ? 'gender-badge-male' : 'gender-badge-female'; ?>">
+                                    <?= $isLakiLaki ? 'Laki-laki' : 'Perempuan'; ?>
+                                </span>
+                            </td>
+                            <td><?= htmlspecialchars($row['no_telp'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td>
+                                <div class="toolbar-actions">
+                                    <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm btn-table">Edit</a>
+                                    <a href="delete.php?id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm btn-table">Hapus</a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
 
         <nav>
             <ul class="pagination">
@@ -162,8 +179,8 @@ require_once '../includes/header.php';
                 <?php } ?>
             </ul>
         </nav>
-
-    </div>
+    </section>
+</div>
 
     <?php mysqli_stmt_close($stmtData); ?>
 <?php require_once '../includes/footer.php'; ?>
