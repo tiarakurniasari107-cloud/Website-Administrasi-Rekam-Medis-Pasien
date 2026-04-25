@@ -7,16 +7,11 @@ if (!isset($_SESSION['id'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
+<?php
+$pageTitle = 'Tambah Poli';
+require_once '../includes/header.php';
+?>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Poli</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-
-<body>
 
     <div class="container mt-4">
 
@@ -53,6 +48,4 @@ if (!isset($_SESSION['id'])) {
 
     </div>
 
-</body>
-
-</html>
+<?php require_once '../includes/footer.php'; ?>

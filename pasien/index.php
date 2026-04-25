@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header('Location: ../auth/login.php');
-    exit;
-}
+require_once '../config/auth.php';
 
 $limit = 10;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -87,16 +81,11 @@ if ($total_page < 1) {
     $total_page = 1;
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
+<?php
+$pageTitle = 'Data Pasien';
+require_once '../includes/header.php';
+?>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Data Pasien</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-
-<body>
 
     <div class="container mt-4">
 
@@ -157,7 +146,7 @@ if ($total_page < 1) {
                         <td><?= htmlspecialchars($row['no_telp'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
                         <td>
                             <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="hapus.php?id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">Hapus</a>
+                            <a href="delete.php?id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">Hapus</a>
                         </td>
                     </tr>
                 <?php } ?>
@@ -177,6 +166,4 @@ if ($total_page < 1) {
     </div>
 
     <?php mysqli_stmt_close($stmtData); ?>
-</body>
-
-</html>
+<?php require_once '../includes/footer.php'; ?>

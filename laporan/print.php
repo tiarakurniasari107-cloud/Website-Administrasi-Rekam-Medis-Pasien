@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+require_once '../config/auth.php';
 
 $jenis = $_GET['jenis'] ?? '';
 $title = 'Laporan Data';
@@ -202,15 +196,9 @@ if ($periode_awal !== '' && $periode_akhir !== '') {
     $periode_label = 'Sampai ' . $periode_akhir;
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title><?= $title; ?></title>
-
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-
+<?php
+$pageTitle = $title;
+$extraHead = <<<'HTML'
     <style>
         @media print {
             .no-print {
@@ -227,8 +215,10 @@ if ($periode_awal !== '' && $periode_akhir !== '') {
             margin-bottom: 30px;
         }
     </style>
-</head>
-<body>
+HTML;
+
+require_once '../includes/header.php';
+?>
 
 <div class="no-print mb-3">
     <button onclick="window.print()" class="btn btn-success">
@@ -316,11 +306,14 @@ if ($periode_awal !== '' && $periode_akhir !== '') {
 
 <?php mysqli_stmt_close($stmt); ?>
 
+<?php
+$extraScripts = <<<'HTML'
 <script>
     window.onload = function () {
         window.print();
     }
 </script>
+HTML;
 
-</body>
-</html>
+require_once '../includes/footer.php';
+?>

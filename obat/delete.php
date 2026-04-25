@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+require_once '../config/auth.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 

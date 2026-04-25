@@ -1,9 +1,7 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (!isset($_SESSION['login'])) {
-    header("Location: ../auth/login.php");
+require_once __DIR__ . '/bootstrap.php';
+
+if (!isset($_SESSION['id'])) {
+    header('Location: ../auth/login.php');
     exit;
 }
-?>

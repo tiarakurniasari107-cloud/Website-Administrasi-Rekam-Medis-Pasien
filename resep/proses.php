@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header('Location: ../auth/login.php');
-    exit;
-}
+require_once '../config/auth.php';
 
 if (isset($_POST['simpan'])) {
     $rekam_medis_id = isset($_POST['rekam_medis_id']) ? (int) $_POST['rekam_medis_id'] : 0;

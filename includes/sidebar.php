@@ -4,7 +4,7 @@
     <a href="../pasien/index.php">Pasien</a>
     <a href="../dokter/index.php">Dokter</a>
     <a href="../poli/index.php">Poli</a>
-    <a href="../jadwal_dokter/index.php">Jadwal Dokter</a>
+    <!-- TODO: aktifkan kembali menu Jadwal Dokter saat modul tersedia. -->
     <a href="../kunjungan/index.php">Kunjungan</a>
     <a href="../rekam_medis/index.php">Rekam Medis</a>
     <a href="../tindakan/index.php">Tindakan</a>

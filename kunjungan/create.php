@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header('Location: ../auth/login.php');
-    exit;
-}
+require_once '../config/auth.php';
 
 $stmtPasien = mysqli_prepare($koneksi, 'SELECT id, nama_pasien FROM pasien ORDER BY nama_pasien ASC');
 mysqli_stmt_execute($stmtPasien);
@@ -19,14 +13,11 @@ $stmtPoli = mysqli_prepare($koneksi, 'SELECT id, nama_poli FROM poli ORDER BY na
 mysqli_stmt_execute($stmtPoli);
 $poli = mysqli_stmt_get_result($stmtPoli);
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Kunjungan</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Tambah Kunjungan';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-4">
 
@@ -125,5 +116,4 @@ $poli = mysqli_stmt_get_result($stmtPoli);
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

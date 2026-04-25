@@ -1,20 +1,17 @@
 <?php
-session_start();
+require_once '../config/auth.php';
 
-if (!isset($_SESSION['id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+header('Expires: Sat, 01 Jan 2000 00:00:00 GMT');
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Klinik</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Dashboard Klinik';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-5">
 
@@ -33,5 +30,4 @@ if (!isset($_SESSION['id'])) {
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

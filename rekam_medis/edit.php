@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header('Location: ../auth/login.php');
-    exit;
-}
+require_once '../config/auth.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($id <= 0) {
@@ -48,15 +42,11 @@ if (!empty($data['tanggal_pemeriksaan'])) {
     $tanggalPemeriksaan = date('Y-m-d\\TH:i', strtotime($data['tanggal_pemeriksaan']));
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Rekam Medis</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Edit Rekam Medis';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-4">
 
@@ -153,5 +143,4 @@ if (!empty($data['tanggal_pemeriksaan'])) {
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

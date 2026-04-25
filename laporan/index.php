@@ -1,21 +1,12 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+require_once '../config/auth.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Laporan</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Menu Laporan';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-4">
 
@@ -27,15 +18,15 @@ if (!isset($_SESSION['id'])) {
 
     <div class="list-group">
 
-        <a href="laporan_pasien.php" class="list-group-item list-group-item-action">
+        <a href="laporan_simple.php?jenis=pasien" class="list-group-item list-group-item-action">
             Laporan Pasien
         </a>
 
-        <a href="laporan_dokter.php" class="list-group-item list-group-item-action">
+        <a href="laporan_simple.php?jenis=dokter" class="list-group-item list-group-item-action">
             Laporan Dokter
         </a>
 
-        <a href="laporan_poli.php" class="list-group-item list-group-item-action">
+        <a href="laporan_simple.php?jenis=poli" class="list-group-item list-group-item-action">
             Laporan Poli
         </a>
 
@@ -47,11 +38,11 @@ if (!isset($_SESSION['id'])) {
             Laporan Rekam Medis
         </a>
 
-        <a href="laporan_obat.php" class="list-group-item list-group-item-action">
+        <a href="laporan_simple.php?jenis=obat" class="list-group-item list-group-item-action">
             Laporan Obat
         </a>
 
-        <a href="laporan_tindakan.php" class="list-group-item list-group-item-action">
+        <a href="laporan_simple.php?jenis=tindakan" class="list-group-item list-group-item-action">
             Laporan Tindakan
         </a>
 
@@ -63,5 +54,4 @@ if (!isset($_SESSION['id'])) {
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

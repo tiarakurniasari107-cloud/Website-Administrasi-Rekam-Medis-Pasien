@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+require_once '../config/auth.php';
 
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
@@ -31,14 +25,11 @@ mysqli_stmt_execute($stmtPoli);
 $poli = mysqli_stmt_get_result($stmtPoli);
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Dokter</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Edit Dokter';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-4">
 
@@ -165,5 +156,4 @@ $poli = mysqli_stmt_get_result($stmtPoli);
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

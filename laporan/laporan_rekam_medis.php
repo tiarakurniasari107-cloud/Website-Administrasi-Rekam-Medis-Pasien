@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/koneksi.php';
-
-if (!isset($_SESSION['id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+require_once '../config/auth.php';
 
 function normalizeDate($value)
 {
@@ -89,14 +83,11 @@ if ($tanggal_akhir !== '') {
 $printUrl = 'print.php?' . http_build_query($printParams);
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Laporan Rekam Medis</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Laporan Rekam Medis';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-4">
 
@@ -176,5 +167,4 @@ $printUrl = 'print.php?' . http_build_query($printParams);
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

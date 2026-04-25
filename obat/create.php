@@ -7,14 +7,11 @@ if (!isset($_SESSION['id'])) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Obat</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-</head>
-<body>
+<?php
+$pageTitle = 'Tambah Obat';
+require_once '../includes/header.php';
+?>
+
 
 <div class="container mt-4">
 
@@ -75,5 +72,4 @@ if (!isset($_SESSION['id'])) {
 
 </div>
 
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>

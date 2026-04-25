@@ -24,14 +24,12 @@ if (isset($_POST['login'])) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
+<?php
+$pageTitle = 'Login';
+$bodyAttributes = 'class="bg-light"';
+require_once '../includes/header.php';
+?>
+
 <div class="container mt-5" style="max-width: 400px;">
     <div class="card shadow">
         <div class="card-body">
@@ -51,5 +49,4 @@ if (isset($_POST['login'])) {
         </div>
     </div>
 </div>
-</body>
-</html>
+<?php require_once '../includes/footer.php'; ?>
