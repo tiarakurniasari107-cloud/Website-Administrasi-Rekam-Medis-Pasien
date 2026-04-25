@@ -1,0 +1,251 @@
+/* Unified custom styles for Klinik Pratama UI
+   Matches provided reference screenshots while keeping HTML structure intact.
+*/
+
+:root {
+  --primary-500: #0b6aa8;
+  --primary-700: #06345a;
+  --accent: #12b3d6;
+  --muted-bg: #eef8fb;
+  --card-bg: #ffffff;
+  --danger: #e74c3c;
+  --success: #2ca58d;
+  --text-dark: #12314a;
+}
+
+/* Global */
+html,
+body {
+  height: 100%;
+}
+body {
+  background: var(--muted-bg);
+  font-family: "Poppins", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Header / page title area */
+.page-header {
+  background: linear-gradient(
+    90deg,
+    var(--primary-700) 0%,
+    var(--primary-500) 100%
+  );
+  color: #fff;
+  padding: 26px 28px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(3, 23, 64, 0.12);
+  margin-bottom: 22px;
+}
+.page-header h2 {
+  font-size: 28px;
+  margin: 0 0 6px;
+}
+.page-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* White rounded content boxes */
+.rounded-box,
+.panel,
+.well,
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(3, 23, 64, 0.06);
+  border: 1px solid rgba(10, 120, 160, 0.06);
+}
+.rounded-panel {
+  padding: 24px;
+}
+
+/* Form controls */
+.form-control {
+  border: 1px solid rgba(18, 141, 160, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: none;
+}
+select.form-control {
+  height: 38px;
+}
+.input-group .form-control {
+  border-radius: 6px;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.btn-primary {
+  background: var(--primary-500);
+  border-color: rgba(4, 95, 140, 0.9);
+  box-shadow: none;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #095f8a;
+}
+.btn-secondary {
+  background: #fff;
+  border: 1px solid var(--primary-500);
+  color: var(--primary-500);
+}
+.btn-danger {
+  background: var(--danger);
+  border-color: #d64536;
+  color: #fff;
+}
+
+/* Table styling */
+.table {
+  background: transparent;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+.table > tbody > tr {
+  background: var(--card-bg);
+  border-radius: 10px;
+}
+.table thead th {
+  border-bottom: none;
+  color: #214a66;
+  font-weight: 600;
+}
+.table td,
+.table th {
+  vertical-align: middle;
+  border: none;
+  padding: 18px;
+}
+
+/* Badges for gender */
+.badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.badge-male {
+  background: #dff6ff;
+  color: #0b6aa8;
+}
+.badge-female {
+  background: #ffe6f0;
+  color: #d64d7a;
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(180deg, var(--primary-700), #0b3b64);
+  color: #e6f7ff;
+  min-height: 100vh;
+  width: 240px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding-top: 22px;
+  padding-bottom: 40px;
+}
+.sidebar h4 {
+  color: #dff6ff;
+  padding-left: 18px;
+}
+.sidebar a {
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 12px 20px;
+  text-decoration: none;
+  border-left: 4px solid transparent;
+  margin: 6px 10px;
+  border-radius: 6px;
+}
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-left-color: var(--accent);
+  color: #fff;
+}
+
+/* Content area shift to accommodate fixed sidebar */
+.container-main {
+  margin-left: 260px;
+  padding: 30px;
+}
+
+/* Dashboard number cards */
+.metrics .card {
+  padding: 18px;
+  border-radius: 10px;
+  text-align: center;
+}
+.metrics .card h3 {
+  font-size: 28px;
+  color: var(--primary-500);
+  margin: 8px 0;
+}
+.metrics .card p {
+  margin: 0;
+  color: #6b8aa1;
+}
+
+/* Action buttons group */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Form card layout */
+.form-row {
+  display: flex;
+  gap: 18px;
+}
+.form-row .col {
+  flex: 1;
+}
+
+/* Print/report header */
+.report-summary {
+  background: rgba(15, 120, 170, 0.06);
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(11, 106, 168, 0.06);
+  color: #0b6aa8;
+  margin-bottom: 14px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 991px) {
+  .container-main {
+    margin-left: 0;
+    padding: 20px;
+  }
+  .sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-header {
+    padding: 18px;
+    border-radius: 8px;
+  }
+  .btn {
+    padding: 8px 10px;
+  }
+}
+
+/* Utility tweaks */
+.text-muted-weak {
+  color: #6b8aa1;
+}
+
+/* Make tables look like the reference by soft separators */
+.table tbody tr + tr {
+  margin-top: 6px;
+}
