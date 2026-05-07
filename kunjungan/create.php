@@ -1,5 +1,10 @@
 <?php
 require_once '../config/auth.php';
+require_once '../config/koneksi.php';
+
+if (!isset($koneksi) || !$koneksi) {
+    die('Database connection failed');
+}
 
 $selectedPasienId = isset($_GET['pasien_id']) ? (int) $_GET['pasien_id'] : 0;
 
