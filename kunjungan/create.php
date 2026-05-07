@@ -1,6 +1,8 @@
 <?php
 require_once '../config/auth.php';
 
+$selectedPasienId = isset($_GET['pasien_id']) ? (int) $_GET['pasien_id'] : 0;
+
 $stmtPasien = mysqli_prepare($koneksi, 'SELECT id, nama_pasien FROM pasien ORDER BY nama_pasien ASC');
 mysqli_stmt_execute($stmtPasien);
 $pasien = mysqli_stmt_get_result($stmtPasien);
@@ -42,7 +44,9 @@ require_once '../includes/header.php';
                     <select id="pasien_id" name="pasien_id" class="form-control" required>
                         <option value="">-- Pilih Pasien --</option>
                         <?php while ($row = mysqli_fetch_assoc($pasien)) { ?>
-                            <option value="<?= $row['id']; ?>"><?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?></option>
+                            <option value="<?= $row['id']; ?>" <?= ($selectedPasienId === (int) $row['id']) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($row['nama_pasien'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
                         <?php } ?>
                     </select>
                 </div>

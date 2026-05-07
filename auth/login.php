@@ -1,28 +1,12 @@
 <?php
-session_start();
-include "../config/koneksi.php";
+require_once '../config/bootstrap.php';
 
-if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $query = mysqli_query($koneksi, "SELECT * FROM users WHERE username='$username' AND password='$password'");
-    $data = mysqli_fetch_assoc($query);
-
-    if ($data) {
-        session_regenerate_id(true);
-        $_SESSION['login'] = true;
-        $_SESSION['id'] = $data['id'];
-        $_SESSION['nama'] = $data['nama_lengkap'];
-        $_SESSION['user_id'] = $data['id'];
-        $_SESSION['nama_lengkap'] = $data['nama_lengkap'];
-        $_SESSION['role'] = $data['role'];
-        header("Location:../dashboard/index.php");
-        exit;
-    } else {
-        $error = "Username atau password salah";
-    }
+if (isset($_SESSION['id'])) {
+    header('Location: ../dashboard/index.php');
+    exit;
 }
+
+$error = isset($_GET['error']) ? 'Username atau password salah' : null;
 ?>
 <?php
 $pageTitle = 'Login';
@@ -43,7 +27,7 @@ require_once '../includes/header.php';
             <div class="alert alert-danger"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
         <?php } ?>
 
-        <form method="post" autocomplete="off">
+        <form method="post" action="proses_login.php" autocomplete="off">
             <div class="mb-3">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" required>

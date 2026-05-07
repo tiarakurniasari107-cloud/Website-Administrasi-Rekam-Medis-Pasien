@@ -5,6 +5,7 @@ $stmt = mysqli_prepare(
     $koneksi,
     "SELECT 
         k.id,
+        k.pasien_id,
         k.kode_kunjungan,
         p.nama_pasien,
         d.nama_dokter,
@@ -22,27 +23,31 @@ $stmt = mysqli_prepare(
 );
 mysqli_stmt_execute($stmt);
 $data = mysqli_stmt_get_result($stmt);
+$canManageRegistrasi = clinic_can_access_module('kunjungan', 'write');
 ?>
 <?php
-$pageTitle = 'Data Kunjungan';
+$pageTitle = 'Data Registrasi';
 require_once '../includes/header.php';
 ?>
 
 <div class="container">
     <section class="page-header">
-        <h2>Data Kunjungan</h2>
-        <p>Kelola data kunjungan pasien</p>
+        <h2>Data Registrasi</h2>
+        <p>Kelola data pendaftaran kunjungan pasien</p>
     </section>
 
     <section class="content-card">
         <div class="toolbar-row">
             <div class="toolbar-actions">
                 <a href="../dashboard/index.php" class="btn btn-back"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Kembali</a>
+                <a href="../registrasi/list_hari_ini.php" class="btn btn-info"><span class="glyphicon glyphicon-time" aria-hidden="true"></span>List Hari Ini</a>
             </div>
 
-            <div class="toolbar-actions">
-                <a href="create.php" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Tambah Kunjungan</a>
-            </div>
+            <?php if ($canManageRegistrasi) { ?>
+                <div class="toolbar-actions">
+                    <a href="create.php" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Tambah Registrasi</a>
+                </div>
+            <?php } ?>
         </div>
 
         <div class="table-wrapper">
@@ -59,6 +64,7 @@ require_once '../includes/header.php';
                         <th>Jenis</th>
                         <th>Cara Bayar</th>
                         <th>Status</th>
+                        <th>History</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -77,10 +83,17 @@ require_once '../includes/header.php';
                         <td><?= htmlspecialchars($row['cara_bayar'], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?= htmlspecialchars($row['status_kunjungan'], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td>
-                            <div class="toolbar-actions">
-                                <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm btn-table">Edit</a>
-                                <a href="delete.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-table" onclick="return confirm('Yakin hapus data?')">Hapus</a>
-                            </div>
+                            <a href="../registrasi/history.php?pasien_id=<?= (int) $row['pasien_id']; ?>" class="btn btn-info btn-sm btn-table">History</a>
+                        </td>
+                        <td>
+                            <?php if ($canManageRegistrasi) { ?>
+                                <div class="toolbar-actions">
+                                    <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm btn-table">Edit</a>
+                                    <a href="delete.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-table" onclick="return confirm('Yakin hapus data?')">Hapus</a>
+                                </div>
+                            <?php } else { ?>
+                                <span>-</span>
+                            <?php } ?>
                         </td>
                     </tr>
                 <?php } ?>

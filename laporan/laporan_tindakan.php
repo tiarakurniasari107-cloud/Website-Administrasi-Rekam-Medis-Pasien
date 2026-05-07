@@ -1,3 +1,3 @@
 <?php
-header('Location: laporan_simple.php?jenis=tindakan');
+header('Location: index.php');
 exit;

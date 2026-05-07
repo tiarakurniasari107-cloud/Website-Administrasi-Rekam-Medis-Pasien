@@ -62,11 +62,6 @@ require_once '../includes/header.php';
                     <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="form-control">
                 </div>
 
-                <div class="mb-2">
-                    <label for="umur">Umur</label>
-                    <input type="number" id="umur" name="umur" class="form-control" placeholder="Tahun">
-                </div>
-
                 <div class="mb-2 field-full">
                     <label for="alamat">Alamat</label>
                     <textarea id="alamat" name="alamat" class="form-control" placeholder="Alamat lengkap pasien"></textarea>

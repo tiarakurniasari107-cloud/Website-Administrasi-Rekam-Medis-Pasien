@@ -76,11 +76,6 @@ require_once '../includes/header.php';
                     <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="form-control" value="<?= htmlspecialchars($data['tanggal_lahir'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
 
-                <div class="mb-2">
-                    <label for="umur">Umur</label>
-                    <input type="number" id="umur" name="umur" class="form-control" value="<?= htmlspecialchars((string) ($data['umur'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
-                </div>
-
                 <div class="mb-2 field-full">
                     <label for="alamat">Alamat</label>
                     <textarea id="alamat" name="alamat" class="form-control"><?= htmlspecialchars($data['alamat'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>

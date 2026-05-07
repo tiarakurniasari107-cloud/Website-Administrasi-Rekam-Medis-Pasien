@@ -3,7 +3,7 @@ require_once '../config/auth.php';
 
 $jenis = isset($_GET['jenis']) ? trim($_GET['jenis']) : '';
 
-$allowed = ['pasien', 'dokter', 'poli', 'obat', 'tindakan'];
+$allowed = ['pasien', 'dokter', 'poli'];
 if (!in_array($jenis, $allowed, true)) {
     header('Location: index.php');
     exit;
@@ -39,33 +39,6 @@ $config = [
         'sql' => 'SELECT nama_poli, keterangan FROM poli ORDER BY id DESC',
         'render' => function ($row, $no) {
             return [$no, $row['nama_poli'], $row['keterangan'] ?? '-'];
-        },
-    ],
-    'obat' => [
-        'title' => 'Laporan Obat',
-        'subtitle' => 'Daftar lengkap data stok obat klinik',
-        'print_jenis' => 'obat',
-        'headers' => ['No', 'Nama Obat', 'Satuan', 'Stok', 'Harga', 'Keterangan'],
-        'sql' => 'SELECT nama_obat, satuan, stok, harga, keterangan FROM obat ORDER BY id DESC',
-        'render' => function ($row, $no) {
-            return [
-                $no,
-                $row['nama_obat'],
-                $row['satuan'] ?? '-',
-                (int) $row['stok'],
-                number_format((float) $row['harga'], 0, ',', '.'),
-                $row['keterangan'] ?? '-',
-            ];
-        },
-    ],
-    'tindakan' => [
-        'title' => 'Laporan Tindakan',
-        'subtitle' => 'Daftar lengkap data tindakan klinik',
-        'print_jenis' => 'tindakan',
-        'headers' => ['No', 'Nama Tindakan', 'Tarif', 'Keterangan'],
-        'sql' => 'SELECT nama_tindakan, tarif, keterangan FROM tindakan ORDER BY id DESC',
-        'render' => function ($row, $no) {
-            return [$no, $row['nama_tindakan'], number_format((float) $row['tarif'], 0, ',', '.'), $row['keterangan'] ?? '-'];
         },
     ],
 ];

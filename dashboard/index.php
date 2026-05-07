@@ -34,7 +34,14 @@ foreach ($queries as $key => $sql) {
 }
 
 $namaUser = htmlspecialchars((string) ($_SESSION['nama'] ?? '-'), ENT_QUOTES, 'UTF-8');
-$roleUser = htmlspecialchars((string) ($_SESSION['role'] ?? '-'), ENT_QUOTES, 'UTF-8');
+$roleUser = htmlspecialchars(clinic_role_label(), ENT_QUOTES, 'UTF-8');
+$canReadPasien = clinic_can_access_module('pasien', 'read');
+$canReadDokter = clinic_can_access_module('dokter', 'read');
+$canReadPoli = clinic_can_access_module('poli', 'read');
+$canReadRegistrasi = clinic_can_access_module('kunjungan', 'read');
+$canReadPemeriksaan = clinic_can_access_module('pemeriksaan', 'read');
+$canReadRekamMedis = clinic_can_access_module('rekam_medis', 'read');
+$canReadLaporan = clinic_can_access_module('laporan', 'read');
 ?>
 
 <?php
@@ -44,7 +51,7 @@ require_once '../includes/header.php';
 
 <div class="container">
     <section class="page-header">
-        <h1>Dashboard Admin</h1>
+        <h1>Dashboard <?= $roleUser; ?></h1>
         <p>Selamat datang, <strong><?= $namaUser; ?></strong></p>
         <p>Role: <strong><?= $roleUser; ?></strong></p>
     </section>
@@ -74,35 +81,67 @@ require_once '../includes/header.php';
     <h3 class="menu-title">Menu Utama</h3>
 
     <section class="menu-grid">
-        <a href="../pasien/index.php" class="menu-card">
-            <span class="glyphicon glyphicon-user menu-icon icon-pasien" aria-hidden="true"></span>
-            <h4 class="menu-name">Data Pasien</h4>
-            <p class="menu-desc">Kelola data pasien klinik</p>
-        </a>
+        <?php if ($canReadPasien) { ?>
+            <a href="../pasien/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-user menu-icon icon-pasien" aria-hidden="true"></span>
+                <h4 class="menu-name">Data Pasien</h4>
+                <p class="menu-desc">Kelola data pasien klinik</p>
+            </a>
+        <?php } ?>
 
-        <a href="../dokter/index.php" class="menu-card">
-            <span class="glyphicon glyphicon-plus-sign menu-icon icon-dokter" aria-hidden="true"></span>
-            <h4 class="menu-name">Data Dokter</h4>
-            <p class="menu-desc">Kelola data dokter</p>
-        </a>
+        <?php if ($canReadRegistrasi) { ?>
+            <a href="../kunjungan/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-list-alt menu-icon icon-kunjungan" aria-hidden="true"></span>
+                <h4 class="menu-name">Registrasi</h4>
+                <p class="menu-desc">Kelola pendaftaran dan kunjungan pasien</p>
+            </a>
 
-        <a href="../poli/index.php" class="menu-card">
-            <span class="glyphicon glyphicon-th-large menu-icon icon-poli" aria-hidden="true"></span>
-            <h4 class="menu-name">Data Poli</h4>
-            <p class="menu-desc">Kelola data poliklinik</p>
-        </a>
+            <a href="../registrasi/list_hari_ini.php" class="menu-card">
+                <span class="glyphicon glyphicon-time menu-icon icon-kunjungan" aria-hidden="true"></span>
+                <h4 class="menu-name">List Registrasi Hari Ini</h4>
+                <p class="menu-desc">Pantau antrean pasien hari ini</p>
+            </a>
+        <?php } ?>
 
-        <a href="../kunjungan/index.php" class="menu-card">
-            <span class="glyphicon glyphicon-list-alt menu-icon icon-kunjungan" aria-hidden="true"></span>
-            <h4 class="menu-name">Data Kunjungan</h4>
-            <p class="menu-desc">Kelola data kunjungan</p>
-        </a>
+        <?php if ($canReadPemeriksaan) { ?>
+            <a href="../pemeriksaan/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-check menu-icon icon-kunjungan" aria-hidden="true"></span>
+                <h4 class="menu-name">Pemeriksaan</h4>
+                <p class="menu-desc">Monitoring pasien berdasarkan poliklinik</p>
+            </a>
+        <?php } ?>
 
-        <a href="../laporan/index.php" class="menu-card">
-            <span class="glyphicon glyphicon-stats menu-icon icon-laporan" aria-hidden="true"></span>
-            <h4 class="menu-name">Laporan</h4>
-            <p class="menu-desc">Cetak &amp; lihat laporan</p>
-        </a>
+        <?php if ($canReadRekamMedis) { ?>
+            <a href="../rekam_medis/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-book menu-icon icon-kunjungan" aria-hidden="true"></span>
+                <h4 class="menu-name">Rekam Medis</h4>
+                <p class="menu-desc">Kelola hasil pemeriksaan pasien</p>
+            </a>
+        <?php } ?>
+
+        <?php if ($canReadDokter) { ?>
+            <a href="../dokter/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-plus-sign menu-icon icon-dokter" aria-hidden="true"></span>
+                <h4 class="menu-name">Data Dokter</h4>
+                <p class="menu-desc">Kelola data dokter</p>
+            </a>
+        <?php } ?>
+
+        <?php if ($canReadPoli) { ?>
+            <a href="../poli/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-th-large menu-icon icon-poli" aria-hidden="true"></span>
+                <h4 class="menu-name">Data Poli</h4>
+                <p class="menu-desc">Kelola data poliklinik</p>
+            </a>
+        <?php } ?>
+
+        <?php if ($canReadLaporan) { ?>
+            <a href="../laporan/index.php" class="menu-card">
+                <span class="glyphicon glyphicon-stats menu-icon icon-laporan" aria-hidden="true"></span>
+                <h4 class="menu-name">Laporan</h4>
+                <p class="menu-desc">Cetak &amp; lihat laporan</p>
+            </a>
+        <?php } ?>
     </section>
 </div>
 

@@ -9,7 +9,7 @@ if (isset($_POST['simpan'])) {
     $jenis_kelamin = $_POST['jenis_kelamin'] ?? '';
     $tempat_lahir = trim($_POST['tempat_lahir'] ?? '');
     $tanggal_lahir = trim($_POST['tanggal_lahir'] ?? '');
-    $umur = trim($_POST['umur'] ?? '');
+    $umur = '';
     $alamat = trim($_POST['alamat'] ?? '');
     $no_telp = trim($_POST['no_telp'] ?? '');
     $golongan_darah = trim($_POST['golongan_darah'] ?? '');
@@ -20,6 +20,13 @@ if (isset($_POST['simpan'])) {
     if ($no_rm === '' || $nama_pasien === '' || !in_array($jenis_kelamin, ['L', 'P'], true)) {
         header("Location: create.php");
         exit;
+    }
+
+    if ($tanggal_lahir !== '') {
+        $tanggalObj = DateTime::createFromFormat('Y-m-d', $tanggal_lahir);
+        if ($tanggalObj && $tanggalObj->format('Y-m-d') === $tanggal_lahir) {
+            $umur = (string) $tanggalObj->diff(new DateTime())->y;
+        }
     }
 
     $stmt = mysqli_prepare(

@@ -1,6 +1,8 @@
 <?php
 require_once '../config/auth.php';
 
+$selectedKunjunganId = isset($_GET['kunjungan_id']) ? (int) $_GET['kunjungan_id'] : 0;
+
 $stmtKunjungan = mysqli_prepare(
     $koneksi,
     "SELECT 
@@ -35,7 +37,7 @@ require_once '../includes/header.php';
             <select name="kunjungan_id" class="form-control" required>
                 <option value="">-- Pilih Kunjungan --</option>
                 <?php while ($row = mysqli_fetch_assoc($kunjungan)) { ?>
-                    <option value="<?= $row['id']; ?>">
+                    <option value="<?= $row['id']; ?>" <?= ($selectedKunjunganId === (int) $row['id']) ? 'selected' : ''; ?>>
                         <?= htmlspecialchars($row['kode_kunjungan'] . ' - ' . $row['nama_pasien'] . ' (' . $row['nama_dokter'] . ')', ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php } ?>

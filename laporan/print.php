@@ -40,7 +40,7 @@ function bindParams($stmt, $types, &$params)
     call_user_func_array('mysqli_stmt_bind_param', $args);
 }
 
-if (!in_array($jenis, ['pasien', 'dokter', 'poli', 'kunjungan', 'rekam_medis', 'obat', 'tindakan', 'resep'], true)) {
+if (!in_array($jenis, ['pasien', 'dokter', 'poli', 'kunjungan', 'rekam_medis'], true)) {
     die('Jenis laporan tidak ditemukan.');
 }
 
@@ -116,48 +116,6 @@ switch ($jenis) {
         $sql .= ' ORDER BY rm.id DESC';
         break;
 
-    case 'obat':
-        $title = 'Laporan Data Obat';
-        $headers = ['Nama Obat', 'Satuan', 'Stok', 'Harga', 'Keterangan'];
-        $sql = "SELECT nama_obat, satuan, stok, harga, keterangan FROM obat ORDER BY id DESC";
-        break;
-
-    case 'tindakan':
-        $title = 'Laporan Data Tindakan';
-        $headers = ['Nama Tindakan', 'Tarif', 'Keterangan'];
-        $sql = "SELECT nama_tindakan, tarif, keterangan FROM tindakan ORDER BY id DESC";
-        break;
-
-    case 'resep':
-        $title = 'Laporan Data Resep';
-        $headers = ['Kode Kunjungan', 'Pasien', 'Dokter', 'Tanggal Resep', 'Daftar Obat', 'Catatan'];
-        $sql = "SELECT k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep,
-                    GROUP_CONCAT(CONCAT(o.nama_obat, ' (', rd.dosis, ', ', rd.jumlah, ')') SEPARATOR '; ') AS daftar_obat,
-                    r.catatan
-                FROM resep r
-                INNER JOIN rekam_medis rm ON r.rekam_medis_id = rm.id
-                INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
-                INNER JOIN pasien p ON k.pasien_id = p.id
-                INNER JOIN dokter d ON k.dokter_id = d.id
-                LEFT JOIN resep_detail rd ON rd.resep_id = r.id
-                LEFT JOIN obat o ON rd.obat_id = o.id";
-
-        if ($tanggal_awal !== '') {
-            $sql .= ' WHERE DATE(r.tanggal_resep) >= ?';
-            $types .= 's';
-            $params[] = $tanggal_awal;
-        }
-
-        if ($tanggal_akhir !== '') {
-            $sql .= ($tanggal_awal !== '') ? ' AND ' : ' WHERE ';
-            $sql .= 'DATE(r.tanggal_resep) <= ?';
-            $types .= 's';
-            $params[] = $tanggal_akhir;
-        }
-
-        $sql .= ' GROUP BY r.id, k.kode_kunjungan, p.nama_pasien, d.nama_dokter, r.tanggal_resep, r.catatan';
-        $sql .= ' ORDER BY r.id DESC';
-        break;
 }
 
 $stmt = mysqli_prepare($koneksi, $sql);
@@ -280,23 +238,6 @@ require_once '../includes/header.php';
             <td><?= e($row['diagnosa_kerja']); ?></td>
             <td><?= e($row['terapi']); ?></td>
             <td><?= e($row['tanggal_pemeriksaan']); ?></td>
-        <?php } elseif ($jenis == 'obat') { ?>
-            <td><?= e($row['nama_obat']); ?></td>
-            <td><?= e($row['satuan']); ?></td>
-            <td><?= (int) $row['stok']; ?></td>
-            <td><?= number_format((float) $row['harga'], 0, ',', '.'); ?></td>
-            <td><?= e($row['keterangan']); ?></td>
-        <?php } elseif ($jenis == 'tindakan') { ?>
-            <td><?= e($row['nama_tindakan']); ?></td>
-            <td><?= number_format((float) $row['tarif'], 0, ',', '.'); ?></td>
-            <td><?= e($row['keterangan']); ?></td>
-        <?php } elseif ($jenis == 'resep') { ?>
-            <td><?= e($row['kode_kunjungan']); ?></td>
-            <td><?= e($row['nama_pasien']); ?></td>
-            <td><?= e($row['nama_dokter']); ?></td>
-            <td><?= e($row['tanggal_resep']); ?></td>
-            <td><?= e($row['daftar_obat']); ?></td>
-            <td><?= e($row['catatan']); ?></td>
         <?php } ?>
     </tr>
 <?php } ?>

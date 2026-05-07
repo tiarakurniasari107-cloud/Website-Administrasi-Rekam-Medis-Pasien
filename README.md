@@ -4,11 +4,11 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
 
 ## Fitur Utama
 
-- Login untuk admin / petugas klinik  
+- Login dengan role Admin, Pendaftaran (petugas), dan Dokter  
 - Pendaftaran dan pengelolaan data pasien (CRUD)  
-- Pencatatan kunjungan dan rekam medis untuk setiap pasien  
-- Pencarian pasien dan riwayat medis  
-- Laporan dan cetak data rekam medis (dalam format HTML)
+- Alur registrasi -> pemeriksaan per poli -> rekam medis  
+- Riwayat kunjungan pasien dan list registrasi harian  
+- Laporan pasien, dokter, poli, kunjungan, dan rekam medis
 
 ## Teknologi yang Digunakan
 

@@ -27,6 +27,8 @@ if ($customClass !== '') {
 
 $bodyAttributes = trim((string) $bodyAttributes);
 $GLOBALS['isLoginPageLayout'] = $isLoginPage;
+$flashError = $_SESSION['flash_error'] ?? '';
+unset($_SESSION['flash_error']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -51,4 +53,11 @@ $GLOBALS['isLoginPageLayout'] = $isLoginPage;
         </div>
     </header>
     <main class="clinic-main">
+        <?php if ($flashError !== '') { ?>
+            <div class="container" style="margin-top: 18px;">
+                <div class="alert alert-danger" role="alert">
+                    <?= htmlspecialchars($flashError, ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            </div>
+        <?php } ?>
 <?php } ?>

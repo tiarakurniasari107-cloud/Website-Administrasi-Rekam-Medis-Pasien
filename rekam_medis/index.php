@@ -1,9 +1,18 @@
 <?php
 require_once '../config/auth.php';
 
-$stmt = mysqli_prepare(
-    $koneksi,
-    "SELECT 
+$kunjunganId = isset($_GET['kunjungan_id']) ? (int) $_GET['kunjungan_id'] : 0;
+$where = '';
+$types = '';
+$params = [];
+
+if ($kunjunganId > 0) {
+    $where = ' WHERE k.id = ?';
+    $types = 'i';
+    $params[] = $kunjunganId;
+}
+
+$sql = "SELECT 
         rm.id,
         rm.keluhan,
         rm.diagnosa_kerja,
@@ -16,8 +25,13 @@ $stmt = mysqli_prepare(
     INNER JOIN kunjungan k ON rm.kunjungan_id = k.id
     INNER JOIN pasien p ON k.pasien_id = p.id
     INNER JOIN dokter d ON k.dokter_id = d.id
-    ORDER BY rm.id DESC"
-);
+    $where
+    ORDER BY rm.id DESC";
+
+$stmt = mysqli_prepare($koneksi, $sql);
+if ($types !== '') {
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
+}
 mysqli_stmt_execute($stmt);
 $data = mysqli_stmt_get_result($stmt);
 ?>
@@ -64,6 +78,7 @@ require_once '../includes/header.php';
                 <td><?= htmlspecialchars($row['tanggal_pemeriksaan'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td>
                     <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="print.php?id=<?= $row['id']; ?>" class="btn btn-success btn-sm" target="_blank">Print</a>
                     <a href="delete.php?id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus data?')">Hapus</a>
                 </td>
             </tr>

@@ -75,6 +75,7 @@ if ($keyword !== '' && $jk !== '') {
 
 mysqli_stmt_execute($stmtData);
 $data = mysqli_stmt_get_result($stmtData);
+$canManagePasien = clinic_can_access_module('pasien', 'write');
 
 $total_page = (int) ceil($total_data / $limit);
 if ($total_page < 1) {
@@ -99,7 +100,10 @@ require_once '../includes/header.php';
             </div>
 
             <div class="toolbar-actions">
-                <a href="create.php" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Tambah Pasien</a>
+                <a href="../registrasi/list_hari_ini.php" class="btn btn-info"><span class="glyphicon glyphicon-time" aria-hidden="true"></span>List Registrasi</a>
+                <?php if ($canManagePasien) { ?>
+                    <a href="create.php" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Tambah Pasien</a>
+                <?php } ?>
             </div>
         </div>
 
@@ -160,8 +164,15 @@ require_once '../includes/header.php';
                             <td><?= htmlspecialchars($row['no_telp'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
                             <td>
                                 <div class="toolbar-actions">
-                                    <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm btn-table">Edit</a>
-                                    <a href="delete.php?id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm btn-table">Hapus</a>
+                                    <?php if ($canManagePasien) { ?>
+                                        <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm btn-table">Edit</a>
+                                    <?php } ?>
+                                    <a href="print.php?id=<?= $row['id']; ?>" class="btn btn-success btn-sm btn-table" target="_blank">Print</a>
+                                    <a href="../kunjungan/create.php?pasien_id=<?= $row['id']; ?>" class="btn btn-primary btn-sm btn-table">Registrasi</a>
+                                    <a href="../registrasi/history.php?pasien_id=<?= $row['id']; ?>" class="btn btn-info btn-sm btn-table">History</a>
+                                    <?php if ($canManagePasien) { ?>
+                                        <a href="delete.php?id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm btn-table">Hapus</a>
+                                    <?php } ?>
                                 </div>
                             </td>
                         </tr>

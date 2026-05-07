@@ -26,9 +26,6 @@ require_once '../includes/header.php';
             <a href="laporan_simple.php?jenis=poli"><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>Laporan Poli</a>
             <a href="laporan_kunjungan.php"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Laporan Kunjungan</a>
             <a href="laporan_rekam_medis.php"><span class="glyphicon glyphicon-book" aria-hidden="true"></span>Laporan Rekam Medis</a>
-            <a href="laporan_simple.php?jenis=obat"><span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span>Laporan Obat</a>
-            <a href="laporan_simple.php?jenis=tindakan"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>Laporan Tindakan</a>
-            <a href="laporan_resep.php"><span class="glyphicon glyphicon-list" aria-hidden="true"></span>Laporan Resep</a>
         </div>
     </section>
 </div>
