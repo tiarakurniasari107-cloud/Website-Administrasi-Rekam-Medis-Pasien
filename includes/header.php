@@ -51,6 +51,16 @@ unset($_SESSION['flash_error']);
                 <span>PELAYANAN KESEHATAN PRIMA</span>
             </div>
         </div>
+        <div class="clinic-header-right">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <span class="user-info">
+                    Halo, <?= htmlspecialchars($_SESSION['user_name'] ?? 'User', ENT_QUOTES, 'UTF-8'); ?>
+                </span>
+                <a href="../auth/logout.php" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            <?php endif; ?>
+        </div>
     </header>
     <main class="clinic-main">
         <?php if ($flashError !== '') { ?>
