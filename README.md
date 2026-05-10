@@ -5,12 +5,14 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
 ## 📋 Fitur Utama
 
 ### Autentikasi & Akses
+
 - Login dengan role berdasarkan pengguna:
   - **Admin**: Mengelola semua data aplikasi
   - **Petugas Pendaftaran**: Menangani registrasi pasien baru dan harian
   - **Dokter**: Membuat pemeriksaan dan rekam medis pasien
 
 ### Manajemen Data
+
 - **Pasien**: CRUD lengkap (Tambah, Lihat, Edit, Hapus) dengan validasi data
 - **Dokter**: Kelola data dokter dan spesialisasi
 - **Poli**: Manajemen poliklinik/ruang pemeriksaan
@@ -19,12 +21,14 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
 - **Tindakan**: Pencatatan tindakan medis yang dilakukan
 
 ### Alur Layanan Kesehatan
+
 - **Registrasi**: Pendaftaran pasien ke dalam sistem
 - **Pemeriksaan**: Proses pemeriksaan per poli dengan pencatatan tanda vital
 - **Kunjungan**: Riwayat lengkap kunjungan pasien ke klinik
 - **Rekam Medis**: Dokumentasi lengkap riwayat medis pasien
 
 ### Laporan
+
 - Laporan Pasien
 - Laporan Dokter
 - Laporan Poliklinik
@@ -35,6 +39,7 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
 - Export ke format cetak
 
 ### Dashboard & Monitoring
+
 - Dashboard dengan informasi ringkas
 - List registrasi hari ini
 - Riwayat kunjungan pasien
@@ -177,12 +182,14 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
 ## 🚀 Instalasi & Setup
 
 ### Prasyarat
+
 - XAMPP (atau web server dengan PHP 7.x dan MySQL)
 - Browser modern (Chrome, Firefox, dll)
 
 ### Langkah-langkah Instalasi
 
 1. **Download/Clone Project**
+
    ```bash
    git clone <repository-url>
    # atau extract file ke folder
@@ -190,7 +197,7 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
    ```
 
 2. **Setup Database**
-   - Buka phpMyAdmin (http://localhost/phpmyadmin)
+   - Buka phpMyAdmin (<http://localhost/phpmyadmin>)
    - Import file `klinik_rekam_medis.sql` untuk membuat database dan tabel
 
 3. **Konfigurasi Koneksi Database**
@@ -204,17 +211,20 @@ Website ini dirancang untuk membantu klinik / fasilitas kesehatan sederhana dala
 ## 👤 Role & Permission
 
 ### Admin
+
 - Akses penuh ke semua fitur
 - Dapat mengelola dokter, poli, obat, tindakan
 - Dapat melihat semua laporan
 
 ### Petugas Pendaftaran
+
 - Melakukan registrasi pasien baru
 - Melihat list registrasi harian
 - Melihat riwayat kunjungan pasien
 - Tidak dapat mengedit data master (dokter, poli, obat)
 
 ### Dokter
+
 - Membuat pemeriksaan pasien
 - Membuat rekam medis
 - Membuat resep
@@ -228,11 +238,13 @@ Aplikasi ini dibuat untuk keperluan akademik dan tugas akhir Praktikum Pemrogram
 
 **Kelompok 2 PRAK.WEB SI-C**
 
-### Anggota:
+### Anggota
+
 - **Azriel Yalsha Hanifah** – 124250058
 - **Tiara Edita Kurniasari** – 124250065
 
-### Asisten Lab:
+### Asisten Lab
+
 - **Luthfan Kafi Maulana** - 124230165
 - **Krisna Mus'ad Zein** - 124240154
 
