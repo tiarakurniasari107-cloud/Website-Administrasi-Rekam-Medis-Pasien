@@ -18,6 +18,23 @@ if (isset($_POST['update'])) {
     $caraValid = ['umum', 'bpjs', 'asuransi', 'lainnya'];
     $statusValid = ['menunggu', 'diperiksa', 'selesai', 'batal'];
 
+    $stmtRekam = mysqli_prepare($koneksi, 'SELECT id FROM rekam_medis WHERE kunjungan_id = ?');
+    mysqli_stmt_bind_param($stmtRekam, 'i', $id);
+    mysqli_stmt_execute($stmtRekam);
+    $resultRekam = mysqli_stmt_get_result($stmtRekam);
+    $hasRekamMedis = mysqli_num_rows($resultRekam) > 0;
+    mysqli_stmt_close($stmtRekam);
+
+    if ($hasRekamMedis) {
+        $stmtGetStatus = mysqli_prepare($koneksi, 'SELECT status_kunjungan FROM kunjungan WHERE id = ?');
+        mysqli_stmt_bind_param($stmtGetStatus, 'i', $id);
+        mysqli_stmt_execute($stmtGetStatus);
+        $resultStatus = mysqli_stmt_get_result($stmtGetStatus);
+        $rowStatus = mysqli_fetch_assoc($resultStatus);
+        $status_kunjungan = $rowStatus['status_kunjungan'];
+        mysqli_stmt_close($stmtGetStatus);
+    }
+
     if (
         $id <= 0 ||
         $kode_kunjungan === '' ||

@@ -30,6 +30,15 @@ $dokter = mysqli_stmt_get_result($stmtDokter);
 $stmtPoli = mysqli_prepare($koneksi, 'SELECT id, nama_poli FROM poli ORDER BY nama_poli ASC');
 mysqli_stmt_execute($stmtPoli);
 $poli = mysqli_stmt_get_result($stmtPoli);
+
+$statusOptions = ['menunggu' => 'Menunggu', 'diperiksa' => 'Diperiksa', 'selesai' => 'Selesai', 'batal' => 'Batal'];
+$hasRekamMedis = false;
+$stmtRekam = mysqli_prepare($koneksi, 'SELECT id FROM rekam_medis WHERE kunjungan_id = ?');
+mysqli_stmt_bind_param($stmtRekam, 'i', $id);
+mysqli_stmt_execute($stmtRekam);
+$resultRekam = mysqli_stmt_get_result($stmtRekam);
+$hasRekamMedis = mysqli_num_rows($resultRekam) > 0;
+mysqli_stmt_close($stmtRekam);
 ?>
 <?php
 $pageTitle = 'Edit Kunjungan';
@@ -122,12 +131,16 @@ require_once '../includes/header.php';
 
                 <div class="mb-2">
                     <label for="status_kunjungan">Status Kunjungan</label>
-                    <select id="status_kunjungan" name="status_kunjungan" class="form-control" required>
-                        <option value="menunggu" <?= ($data['status_kunjungan'] === 'menunggu') ? 'selected' : ''; ?>>Menunggu</option>
-                        <option value="diperiksa" <?= ($data['status_kunjungan'] === 'diperiksa') ? 'selected' : ''; ?>>Diperiksa</option>
-                        <option value="selesai" <?= ($data['status_kunjungan'] === 'selesai') ? 'selected' : ''; ?>>Selesai</option>
-                        <option value="batal" <?= ($data['status_kunjungan'] === 'batal') ? 'selected' : ''; ?>>Batal</option>
+                    <select id="status_kunjungan" name="status_kunjungan" class="form-control" required <?= $hasRekamMedis ? 'disabled' : ''; ?>>
+                        <?php foreach ($statusOptions as $key => $label): ?>
+                            <option value="<?= $key; ?>" <?= ($data['status_kunjungan'] === $key) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
+                    <?php if ($hasRekamMedis): ?>
+                        <small class="form-text text-muted">Status terkunci karena sudah ada rekam medis</small>
+                    <?php endif; ?>
                 </div>
 
                 <div class="mb-2 field-full">

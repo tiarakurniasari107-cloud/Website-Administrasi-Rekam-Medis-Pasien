@@ -6,6 +6,18 @@ if (!isset($koneksi) || !$koneksi) {
     die('Database connection failed');
 }
 
+// Generate next kode_kunjungan dengan format: KJ-DDMMYY-NNN
+$today = date('dmy');
+$nextKodeKunjungan = 'KJ-' . $today . '-001';
+
+$resultKodeKunjungan = mysqli_query($koneksi, "SELECT MAX(CAST(SUBSTRING(kode_kunjungan, -3) AS UNSIGNED)) AS max_no FROM kunjungan WHERE kode_kunjungan LIKE 'KJ-" . $today . "-%'");
+if ($resultKodeKunjungan instanceof mysqli_result) {
+    $rowKodeKunjungan = mysqli_fetch_assoc($resultKodeKunjungan);
+    $nextNumber = (int) ($rowKodeKunjungan['max_no'] ?? 0) + 1;
+    $nextKodeKunjungan = 'KJ-' . $today . '-' . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+    mysqli_free_result($resultKodeKunjungan);
+}
+
 $selectedPasienId = isset($_GET['pasien_id']) ? (int) $_GET['pasien_id'] : 0;
 
 $stmtPasien = mysqli_prepare($koneksi, 'SELECT id, nama_pasien FROM pasien ORDER BY nama_pasien ASC');
@@ -38,10 +50,12 @@ require_once '../includes/header.php';
         </div>
 
         <form action="proses.php" method="POST" autocomplete="off">
+            <input type="hidden" name="kode_kunjungan" value="<?= htmlspecialchars($nextKodeKunjungan, ENT_QUOTES, 'UTF-8'); ?>">
+            
             <div class="form-grid">
                 <div class="mb-2 field-full">
-                    <label for="kode_kunjungan">Kode Kunjungan</label>
-                    <input type="text" id="kode_kunjungan" name="kode_kunjungan" class="form-control" placeholder="Masukkan kode kunjungan" required>
+                    <label for="kode_kunjungan_display">Kode Kunjungan</label>
+                    <input type="text" id="kode_kunjungan_display" class="form-control" value="<?= htmlspecialchars($nextKodeKunjungan, ENT_QUOTES, 'UTF-8'); ?>" readonly>
                 </div>
 
                 <div class="mb-2">
@@ -101,16 +115,6 @@ require_once '../includes/header.php';
                         <option value="bpjs">BPJS</option>
                         <option value="asuransi">Asuransi</option>
                         <option value="lainnya">Lainnya</option>
-                    </select>
-                </div>
-
-                <div class="mb-2">
-                    <label for="status_kunjungan">Status Kunjungan</label>
-                    <select id="status_kunjungan" name="status_kunjungan" class="form-control" required>
-                        <option value="menunggu" selected>Menunggu</option>
-                        <option value="diperiksa">Diperiksa</option>
-                        <option value="selesai">Selesai</option>
-                        <option value="batal">Batal</option>
                     </select>
                 </div>
 

@@ -92,6 +92,14 @@ if (isset($_POST['simpan'])) {
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
 
+    $stmtUpdateStatus = mysqli_prepare(
+        $koneksi,
+        "UPDATE kunjungan SET status_kunjungan = 'selesai' WHERE id = ?"
+    );
+    mysqli_stmt_bind_param($stmtUpdateStatus, 'i', $kunjungan_id);
+    mysqli_stmt_execute($stmtUpdateStatus);
+    mysqli_stmt_close($stmtUpdateStatus);
+
     header('Location: index.php');
     exit;
 }

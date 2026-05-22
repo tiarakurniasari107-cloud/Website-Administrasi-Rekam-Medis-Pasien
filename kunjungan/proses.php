@@ -11,11 +11,10 @@ if (isset($_POST['simpan'])) {
     $jenis_kunjungan = $_POST['jenis_kunjungan'] ?? '';
     $cara_bayar = $_POST['cara_bayar'] ?? '';
     $keluhan_utama = trim($_POST['keluhan_utama'] ?? '');
-    $status_kunjungan = $_POST['status_kunjungan'] ?? '';
+    $status_kunjungan = 'menunggu';
 
     $jenisValid = ['baru', 'lama'];
     $caraValid = ['umum', 'bpjs', 'asuransi', 'lainnya'];
-    $statusValid = ['menunggu', 'diperiksa', 'selesai', 'batal'];
 
     if (
         $kode_kunjungan === '' ||
@@ -24,8 +23,7 @@ if (isset($_POST['simpan'])) {
         $tanggal_kunjungan === '' ||
         $jam_kunjungan === '' ||
         !in_array($jenis_kunjungan, $jenisValid, true) ||
-        !in_array($cara_bayar, $caraValid, true) ||
-        !in_array($status_kunjungan, $statusValid, true)
+        !in_array($cara_bayar, $caraValid, true)
     ) {
         header('Location: create.php');
         exit;

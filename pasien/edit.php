@@ -50,7 +50,7 @@ require_once '../includes/header.php';
 
                 <div class="mb-2 field-full">
                     <label for="nik">NIK</label>
-                    <input type="text" id="nik" name="nik" class="form-control" value="<?= htmlspecialchars($data['nik'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="text" id="nik" name="nik" class="form-control" value="<?= htmlspecialchars($data['nik'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" inputmode="numeric" pattern="[0-9]*" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="mb-2 field-full">
@@ -83,7 +83,7 @@ require_once '../includes/header.php';
 
                 <div class="mb-2 field-full">
                     <label for="no_telp">No Telepon</label>
-                    <input type="text" id="no_telp" name="no_telp" class="form-control" value="<?= htmlspecialchars($data['no_telp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="text" id="no_telp" name="no_telp" class="form-control" value="<?= htmlspecialchars($data['no_telp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="mb-2">
