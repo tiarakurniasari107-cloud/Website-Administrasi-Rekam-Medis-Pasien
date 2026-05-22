@@ -35,7 +35,7 @@ require_once '../includes/header.php';
             <div class="form-grid">
                 <div class="mb-2 field-full">
                     <label for="nik">NIK</label>
-                    <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan NIK (16 digit)">
+                    <input type="text" id="nik" name="nik" class="form-control" placeholder="Masukkan NIK (16 digit)" inputmode="numeric" pattern="[0-9]*" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="mb-2 field-full">
@@ -69,7 +69,7 @@ require_once '../includes/header.php';
 
                 <div class="mb-2 field-full">
                     <label for="no_telp">No Telepon</label>
-                    <input type="text" id="no_telp" name="no_telp" class="form-control" placeholder="08xxxxxxxxxx">
+                    <input type="text" id="no_telp" name="no_telp" class="form-control" placeholder="08xxxxxxxxxx" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="mb-2">

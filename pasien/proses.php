@@ -22,6 +22,18 @@ if (isset($_POST['simpan'])) {
         exit;
     }
 
+    // Validasi NIK hanya angka
+    if ($nik !== '' && !preg_match('/^[0-9]+$/', $nik)) {
+        header("Location: create.php");
+        exit;
+    }
+
+    // Validasi No Telepon hanya angka
+    if ($no_telp !== '' && !preg_match('/^[0-9]+$/', $no_telp)) {
+        header("Location: create.php");
+        exit;
+    }
+
     if ($tanggal_lahir !== '') {
         $tanggalObj = DateTime::createFromFormat('Y-m-d', $tanggal_lahir);
         if ($tanggalObj && $tanggalObj->format('Y-m-d') === $tanggal_lahir) {
