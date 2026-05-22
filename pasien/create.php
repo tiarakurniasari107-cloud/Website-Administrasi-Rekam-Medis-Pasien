@@ -69,7 +69,7 @@ require_once '../includes/header.php';
 
                 <div class="mb-2 field-full">
                     <label for="no_telp">No Telepon</label>
-                    <input type="text" id="no_telp" name="no_telp" class="form-control" placeholder="08xxxxxxxxxx" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <input type="text" id="no_telp" name="no_telp" class="form-control" placeholder="08xxxxxxxxxx" inputmode="numeric" pattern="[0-9]*" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
 
                 <div class="mb-2">
@@ -85,7 +85,12 @@ require_once '../includes/header.php';
 
                 <div class="mb-2">
                     <label for="status_kawin">Status Kawin</label>
-                    <input type="text" id="status_kawin" name="status_kawin" class="form-control" placeholder="Status pernikahan">
+                    <select id="status_kawin" name="status_kawin" class="form-control">
+                        <option value="">-- Pilih --</option>
+                        <option value="kawin">Kawin</option>
+                        <option value="belum kawin">Belum Kawin</option>
+                        <option value="cerai">Cerai</option>
+                    </select>
                 </div>
 
                 <div class="mb-2 field-full">

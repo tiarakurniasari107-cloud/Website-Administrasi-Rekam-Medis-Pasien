@@ -31,6 +31,19 @@ $dokter = mysqli_stmt_get_result($stmtDokter);
 $stmtPoli = mysqli_prepare($koneksi, 'SELECT id, nama_poli FROM poli ORDER BY nama_poli ASC');
 mysqli_stmt_execute($stmtPoli);
 $poli = mysqli_stmt_get_result($stmtPoli);
+
+// Get jadwal dokter dengan join untuk mendapat info dokter dan poli
+$stmtJadwal = mysqli_prepare($koneksi, '
+    SELECT jd.id, d.nama_dokter, p.nama_poli, jd.hari, jd.jam_mulai, jd.jam_selesai, jd.dokter_id, jd.poli_id, jd.keterangan
+    FROM jadwal_dokter jd
+    JOIN dokter d ON jd.dokter_id = d.id
+    LEFT JOIN poli p ON jd.poli_id = p.id
+    ORDER BY jd.hari, jd.jam_mulai
+');
+mysqli_stmt_execute($stmtJadwal);
+$jadwal = mysqli_stmt_get_result($stmtJadwal);
+$jadwalData = mysqli_fetch_all($jadwal, MYSQLI_ASSOC);
+mysqli_stmt_close($stmtJadwal);
 ?>
 <?php
 $pageTitle = 'Tambah Kunjungan';
@@ -71,20 +84,32 @@ require_once '../includes/header.php';
                 </div>
 
                 <div class="mb-2">
-                    <label for="dokter_id">Dokter</label>
-                    <select id="dokter_id" name="dokter_id" class="form-control" required>
-                        <option value="">-- Pilih Dokter --</option>
-                        <?php while ($row = mysqli_fetch_assoc($dokter)) { ?>
-                            <option value="<?= $row['id']; ?>"><?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?></option>
+                    <label for="jadwal_dokter_id">Jadwal Dokter</label>
+                    <select id="jadwal_dokter_id" name="jadwal_dokter_id" class="form-control" required>
+                        <option value="">-- Pilih Jadwal Dokter --</option>
+                        <?php foreach ($jadwalData as $row) { ?>
+                            <option value="<?= $row['id']; ?>" data-dokter-id="<?= $row['dokter_id']; ?>" data-poli-id="<?= $row['poli_id']; ?>" data-jam-mulai="<?= htmlspecialchars($row['jam_mulai'], ENT_QUOTES, 'UTF-8'); ?>" data-jam-selesai="<?= htmlspecialchars($row['jam_selesai'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?> - <?= htmlspecialchars($row['hari'], ENT_QUOTES, 'UTF-8'); ?> (<?= htmlspecialchars($row['jam_mulai'], ENT_QUOTES, 'UTF-8'); ?> - <?= htmlspecialchars($row['jam_selesai'], ENT_QUOTES, 'UTF-8'); ?>) - <?= htmlspecialchars($row['nama_poli'] ?? 'Umum', ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
                         <?php } ?>
                     </select>
                 </div>
 
                 <div class="mb-2">
+                    <label for="dokter_id">Dokter</label>
+                    <select id="dokter_id" name="dokter_id" class="form-control" readonly>
+                        <option value="">-- Dokter akan otomatis terisi --</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
                     <label for="poli_id">Poli</label>
-                    <select id="poli_id" name="poli_id" class="form-control">
-                        <option value="">-- Pilih Poli (Opsional) --</option>
-                        <?php while ($row = mysqli_fetch_assoc($poli)) { ?>
+                    <select id="poli_id" name="poli_id" class="form-control" readonly>
+                        <option value="">-- Poli akan otomatis terisi --</option>
+                        <?php 
+                        // Reset pointer untuk poli
+                        $poliResult = mysqli_query($koneksi, 'SELECT id, nama_poli FROM poli ORDER BY nama_poli ASC');
+                        while ($row = mysqli_fetch_assoc($poliResult)) { ?>
                             <option value="<?= $row['id']; ?>"><?= htmlspecialchars($row['nama_poli'], ENT_QUOTES, 'UTF-8'); ?></option>
                         <?php } ?>
                     </select>
@@ -105,7 +130,7 @@ require_once '../includes/header.php';
 
                 <div class="mb-2">
                     <label for="jam_kunjungan">Jam Kunjungan</label>
-                    <input type="time" id="jam_kunjungan" name="jam_kunjungan" class="form-control" required>
+                    <input type="time" id="jam_kunjungan" name="jam_kunjungan" class="form-control" readonly placeholder="Otomatis terisi dari jadwal">
                 </div>
 
                 <div class="mb-2">
@@ -138,5 +163,32 @@ require_once '../includes/header.php';
     </section>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const jadwalSelect = document.getElementById('jadwal_dokter_id');
+    const dokterSelect = document.getElementById('dokter_id');
+    const poliSelect = document.getElementById('poli_id');
+    const jamKunjunganInput = document.getElementById('jam_kunjungan');
+
+    // Handle jadwal dokter change
+    jadwalSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const dokterId = selectedOption.dataset.dokterId;
+        const poliId = selectedOption.dataset.poliId;
+        const jamMulai = selectedOption.dataset.jamMulai;
+
+        dokterSelect.value = dokterId || '';
+        
+        if (poliId) {
+            poliSelect.value = poliId;
+        } else {
+            poliSelect.value = '';
+        }
+        
+        jamKunjunganInput.value = jamMulai || '';
+    });
+});
+</script>
 
 <?php require_once '../includes/footer.php'; ?>

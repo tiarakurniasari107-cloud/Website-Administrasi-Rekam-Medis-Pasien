@@ -31,6 +31,19 @@ $stmtPoli = mysqli_prepare($koneksi, 'SELECT id, nama_poli FROM poli ORDER BY na
 mysqli_stmt_execute($stmtPoli);
 $poli = mysqli_stmt_get_result($stmtPoli);
 
+// Get jadwal dokter dengan join
+$stmtJadwal = mysqli_prepare($koneksi, '
+    SELECT jd.id, d.nama_dokter, p.nama_poli, jd.hari, jd.jam_mulai, jd.jam_selesai, jd.dokter_id, jd.poli_id, jd.keterangan
+    FROM jadwal_dokter jd
+    JOIN dokter d ON jd.dokter_id = d.id
+    LEFT JOIN poli p ON jd.poli_id = p.id
+    ORDER BY jd.hari, jd.jam_mulai
+');
+mysqli_stmt_execute($stmtJadwal);
+$jadwal = mysqli_stmt_get_result($stmtJadwal);
+$jadwalData = mysqli_fetch_all($jadwal, MYSQLI_ASSOC);
+mysqli_stmt_close($stmtJadwal);
+
 $statusOptions = ['menunggu' => 'Menunggu', 'diperiksa' => 'Diperiksa', 'selesai' => 'Selesai', 'batal' => 'Batal'];
 $hasRekamMedis = false;
 $stmtRekam = mysqli_prepare($koneksi, 'SELECT id FROM rekam_medis WHERE kunjungan_id = ?');
@@ -79,13 +92,32 @@ require_once '../includes/header.php';
                 </div>
 
                 <div class="mb-2">
+                    <label for="jadwal_dokter_id">Jadwal Dokter</label>
+                    <select id="jadwal_dokter_id" name="jadwal_dokter_id" class="form-control">
+                        <option value="">-- Pilih Jadwal Dokter (Opsional) --</option>
+                        <?php foreach ($jadwalData as $row) { ?>
+                            <option value="<?= $row['id']; ?>" data-dokter-id="<?= $row['dokter_id']; ?>" data-poli-id="<?= $row['poli_id']; ?>" data-jam-mulai="<?= htmlspecialchars($row['jam_mulai'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?> - <?= htmlspecialchars($row['hari'], ENT_QUOTES, 'UTF-8'); ?> (<?= htmlspecialchars($row['jam_mulai'], ENT_QUOTES, 'UTF-8'); ?> - <?= htmlspecialchars($row['jam_selesai'], ENT_QUOTES, 'UTF-8'); ?>) - <?= htmlspecialchars($row['nama_poli'] ?? 'Umum', ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+
+                <div class="mb-2">
                     <label for="dokter_id">Dokter</label>
                     <select id="dokter_id" name="dokter_id" class="form-control" required>
-                        <?php while ($row = mysqli_fetch_assoc($dokter)) { ?>
+                        <?php 
+                        // Reset dokter result
+                        $stmtDokter2 = mysqli_prepare($koneksi, 'SELECT id, nama_dokter FROM dokter ORDER BY nama_dokter ASC');
+                        mysqli_stmt_execute($stmtDokter2);
+                        $dokter2 = mysqli_stmt_get_result($stmtDokter2);
+                        while ($row = mysqli_fetch_assoc($dokter2)) { ?>
                             <option value="<?= $row['id']; ?>" <?= ((int) $row['id'] === (int) $data['dokter_id']) ? 'selected' : ''; ?>>
                                 <?= htmlspecialchars($row['nama_dokter'], ENT_QUOTES, 'UTF-8'); ?>
                             </option>
-                        <?php } ?>
+                        <?php } 
+                        mysqli_stmt_close($stmtDokter2);
+                        ?>
                     </select>
                 </div>
 
@@ -93,7 +125,10 @@ require_once '../includes/header.php';
                     <label for="poli_id">Poli</label>
                     <select id="poli_id" name="poli_id" class="form-control">
                         <option value="">-- Pilih Poli (Opsional) --</option>
-                        <?php while ($row = mysqli_fetch_assoc($poli)) { ?>
+                        <?php 
+                        // Reset poli result
+                        $poliResult = mysqli_query($koneksi, 'SELECT id, nama_poli FROM poli ORDER BY nama_poli ASC');
+                        while ($row = mysqli_fetch_assoc($poliResult)) { ?>
                             <option value="<?= $row['id']; ?>" <?= ((int) $row['id'] === (int) $data['poli_id']) ? 'selected' : ''; ?>>
                                 <?= htmlspecialchars($row['nama_poli'], ENT_QUOTES, 'UTF-8'); ?>
                             </option>
@@ -158,10 +193,40 @@ require_once '../includes/header.php';
         <?php
         mysqli_stmt_close($stmtData);
         mysqli_stmt_close($stmtPasien);
-        mysqli_stmt_close($stmtDokter);
         mysqli_stmt_close($stmtPoli);
         ?>
     </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const jadwalSelect = document.getElementById('jadwal_dokter_id');
+    const dokterSelect = document.getElementById('dokter_id');
+    const poliSelect = document.getElementById('poli_id');
+    const jamKunjunganInput = document.getElementById('jam_kunjungan');
+
+    // Handle jadwal dokter change
+    jadwalSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const dokterId = selectedOption.dataset.dokterId;
+        const poliId = selectedOption.dataset.poliId;
+        const jamMulai = selectedOption.dataset.jamMulai;
+
+        if (dokterId) {
+            dokterSelect.value = dokterId;
+        }
+        
+        if (poliId) {
+            poliSelect.value = poliId;
+        } else {
+            poliSelect.value = '';
+        }
+        
+        if (jamMulai) {
+            jamKunjunganInput.value = jamMulai;
+        }
+    });
+});
+</script>
 
 <?php require_once '../includes/footer.php'; ?>
